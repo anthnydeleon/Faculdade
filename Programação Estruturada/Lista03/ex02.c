@@ -16,9 +16,7 @@ void le_matriz(double matriz[][MAX], int n) {
 double soma_diagonal_superior(double matriz [][MAX], int n) {
   double value = 0;
   for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      if (j >= i) value += matriz[i][j];
-    }
+    value += matriz[i][i];
   }
   return value;
 } 
