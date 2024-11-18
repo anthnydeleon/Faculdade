@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 // Questão 4. Escreva um programa que receba uma palavra e uma frase como entrada. O programa
 // deve escrever “sim” se a palavra estiver presente na frase e “não” caso contrário
 
