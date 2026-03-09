@@ -1,0 +1,106 @@
+-- Sequence Recognizer: VHDL Moore Machine para DE10-Lite
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity seq_rec_moore is
+   port(
+      KEY: in std_logic_vector(1 downto 0); -- KEY(1): reset, KEY(0): clock
+      SW: in std_logic_vector(0 downto 0);  -- SW(0): entrada X
+      LEDR: out std_logic_vector(4 downto 0); -- Indica estado (A–E)
+      HEX0: out std_logic_vector(6 downto 0);  -- Mostra letra do estado
+		HEX1: out std_logic_vector(6 downto 0)  -- Mostra letra do estado
+   );
+end seq_rec_moore;
+
+architecture moore_arch of seq_rec_moore is
+   type state_type is (A, B, C, D, E); -- 'E' é o estado de aceitação
+   signal state, next_state : state_type;
+   signal X: std_logic;
+	
+begin
+   X <= SW(0); -- Entrada X controlada pela chave SW(0)
+
+   -- Process 1 - registrador de estado com reset e clock dos botões
+   state_register: process(KEY)
+   begin
+      if (KEY(1) = '0') then -- Reset (botão pressionado)
+         state <= A;
+      elsif rising_edge(KEY(0)) then -- Clock (botão pressionado)
+         state <= next_state;
+      end if;
+   end process;
+
+   -- Process 2 - lógica de transição de estados
+   next_state_func: process (X, state)
+   begin
+      case state is
+         when A =>
+            if X = '1' then 
+               next_state <= B;
+            else 
+               next_state <= A;
+            end if;
+
+         when B =>
+            if X = '1' then
+               next_state <= C;
+            else 
+               next_state <= A; 
+            end if;
+
+         when C =>
+            if X = '0' then 
+               next_state <= D;
+            else 
+               next_state <= C;
+            end if;
+
+         when D =>
+            if X = '1' then 
+               next_state <= E;
+            else 
+               next_state <= A;
+            end if;
+
+         when E =>
+            if X = '1' then 
+               next_state <= C;
+            else 
+               next_state <= A;
+            end if;
+      end case;
+   end process;
+
+   -- Process 3: indica visualmente o estado atual
+   current_state_ledr: process(state)
+   begin
+      LEDR <= "00000";
+      case state is
+         when A => LEDR(0) <= '1';
+         when B => LEDR(1) <= '1';
+         when C => LEDR(2) <= '1';
+         when D => LEDR(3) <= '1';
+         when E => LEDR(4) <= '1';
+      end case;
+   end process;
+
+   -- HEX0: exibe a letra correspondente ao estado atual
+   with state select
+      HEX0(6 downto 0) <=
+         "0001000" when A,  -- A
+         "0000011" when B,  -- b
+         "1000110" when C,  -- C
+         "0100001" when D,  -- d
+         "0000110" when E;  -- E
+			
+   -- HEX1: exibe a 1 se a sequencia for reconhecida e 0 se não reconhecida
+   with state select
+      HEX1(6 downto 0) <=
+         "1000000" when A,  -- A
+         "1000000" when B,  -- b
+         "1000000" when C,  -- C
+         "1000000" when D,  -- d
+         "1111001" when E;  -- E
+
+
+end moore_arch;

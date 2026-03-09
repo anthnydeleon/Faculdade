@@ -2,59 +2,66 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Implemente a função char aluno_cmp(Aluno *a, Aluno *b) que recebe dois ponteiros para a
+// estrutura Aluno e returna 1 se o conteúdo dos alunos apontados por a e b é o mesmo e 0, caso
+// contrário. Uma observação importante: não estou pedindo para comparar os endereços de a e b, mas
+// sim os conteúdos desses objetos.
+
 typedef struct _aluno {
-int ra;
-char nome[1000];
-char sexo;
-int idade;
+  int ra;
+  char nome[1000];
+  char sexo;
+  int idade;
 }* Aluno;
 
-char aluno_cmp(Aluno* a, Aluno* b) {
-  if ((*a)->ra == (*b)->ra && 
-    strcmp((*a)->nome, (*b)->nome) == 0 && 
-    (*a)->sexo == (*b)->sexo && 
-    (*a)->idade == (*b)->idade) {
-    return 1;
-  }
-  return 0;
-}
+Aluno cria_aluno() {
+  Aluno aluno;
+  aluno = calloc(1, sizeof(struct _aluno));
 
-void limpar_memoria(Aluno* a) {
-  if (*a != NULL) {
-    free(*a);
-    *a = NULL;
-  } 
-}
-
-void ler_aluno(Aluno* aluno) {
   printf("Digite o RA: ");
-  scanf("%d", &(*aluno)->ra);
+  scanf("%d", &aluno->ra);
   getchar();
 
-  printf("Digite o nome: ");
-  scanf("%[^\n]", (*aluno)->nome);
+  printf("Digite o Nome: ");
+  scanf("%[^\n]", aluno->nome);
   getchar();
-  
-  printf("Digite o sexo: ");
-  scanf("%c", &(*aluno)->sexo);
 
-  printf("Digite a idade: ");
-  scanf("%d", &(*aluno)->idade);
+  printf("Digite o Sexo: ");
+  scanf("%c", &aluno->sexo);
+  getchar();
+
+  printf("Digite o Idade: ");
+  scanf("%d", &aluno->idade);
+
+  return aluno;
+}
+
+char aluno_cmp(Aluno *a, Aluno *b) {
+  if ((*a)->ra == (*b)->ra && 
+    (*a)->idade == (*b)->idade 
+    && (*a)->sexo == (*b)->sexo 
+    && strcmp((*a)->nome, (*b)->nome) == 0) return 1;
+
+  return 0;  
+}
+
+void print_aluno(Aluno aluno) {
+  printf("RA: %d\n", aluno->ra);
+  printf("NOME: %s\n", aluno->nome);
+  printf("SEXO: %c\n", aluno->sexo);
+  printf("IDADE: %d\n", aluno->idade);
 }
 
 int main() {
-  Aluno aluno_a = malloc(sizeof(struct _aluno));
-  ler_aluno(&aluno_a);
-  printf("Aluno: %s\n", aluno_a->nome);
+  Aluno a = cria_aluno();
+  Aluno b = cria_aluno();
 
-  Aluno aluno_b = malloc(sizeof(struct _aluno));
-  ler_aluno(&aluno_b);
-  printf("Aluno: %s\n", aluno_b->nome);
+  int result = aluno_cmp(&a, &b);
 
-  (aluno_cmp(&aluno_a, &aluno_b)) ? printf("Os alunos sao iguais!\n") : printf("Os alunos sao diferentes!\n");
+  (result == 1) ? printf("iguais") : printf("diferentes"); 
 
-  limpar_memoria(&aluno_a);
-  limpar_memoria(&aluno_b);
-  
+  free(a);
+  free(b);
+
   return 0;
 }

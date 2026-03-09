@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-// Implemente as funções:
+
+// Questão 9. Implemente as funções:
 // • matriz_le(n, m) essa função lê e retorna uma matriz M de números inteiros fornecida pelo
 // usuário. Ela recebe dois parâmetros n e m, onde n é o número de linhas e m, o de colunas. Essa
 // função é responsável por alocar a memória para M e por ler todo o conteúdo de M, que deverá ser
@@ -9,21 +9,20 @@
 // • matriz_print(M, n, m) essa função imprime na tela do usuário a matriz M que tem n linhas
 // e m colunas.
 
-int** le_matriz(int n, int m) {
-  int** matriz = calloc(n, sizeof(int));
-
-  printf("Digite a matriz %dx%d: ", n, m);
+int** matriz_le(int n, int m) {
+  int** M = calloc(n, sizeof(int*)); 
+  for (int i = 0; i < n; i++) M[i] = calloc(m, sizeof(int));
+  
   for (int i = 0; i < n; i++) {
-    matriz[i] = calloc(m, sizeof(int));
     for (int j = 0; j < m; j++) {
-      scanf("%d", &matriz[i][j]);
+      scanf("%d", &M[i][j]); 
     }
   }
-  return matriz;
+
+  return M;
 }
 
 void imprime_matriz(int** M, int n, int m) {
-  printf("\nMatriz: \n");
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < m; j++) {
       printf("%d ", M[i][j]);
@@ -33,15 +32,11 @@ void imprime_matriz(int** M, int n, int m) {
 }
 
 int main() {
-  int nlines, ncols;
-  printf("Digite o numero de linhas e colunas: ");
-  scanf("%d %d", &nlines, &ncols);
+  int n = 3, m = 2;
+  int** matriz = matriz_le(n, m);
+  imprime_matriz(matriz, n, m);
 
-  int** matriz = le_matriz(nlines, ncols);
-
-  imprime_matriz(matriz, nlines, ncols);
-
-  for (int i = 0; i < nlines; i++) {
+  for (int i = 0; i < n; i++) {
     free(matriz[i]);
   }
   free(matriz);

@@ -1,0 +1,42 @@
+﻿# Intel Corporation Software and/or Intellectual Property License File
+# Issued 20 July 2025
+# Upgrade to these products will no longer be available after the Maintenance Expiration  
+# date unless licenses are renewed.  
+# Fixed Node License
+# Primary Machine Name-Anthony Deleon
+# Primary Machine ID-NIC ID 9C6B002B4BA6
+# Companion ID-N/A
+# Companion ID 2-N/A
+# Product License Summary:
+# 3 Questa*- FPGA Starter Edition (License: SW-QUESTA), 1 Seat(s)
+# - Maintenance Expiration of 2026.07
+# - License Expires 20-Jul-2026
+# 3 Questa*- FPGA Starter Edition (License: SW-QUESTA), 1 Seat(s)
+# - Maintenance Expiration of 2026.07
+# - License Expires 20-Jul-2026
+################################################################################ 
+# FEATURE START 
+# This is license file for Questasim*-Intel FPGA Starter Edition 
+# Number of seat licenses is 1 
+# License Expires 20-Jul-2026 
+DAEMON mgcld path_to_mgcld
+INCREMENT intelqsimstarter mgcld 2026.07 20-jul-2026 uncounted \
+    BF0ACD7488D54072EEF4 VENDOR_STRING=D9B0C1CC HOSTID=9c6b002b4ba6 \
+    ISSUER=Intel SN=298395528 SIGN2="0E15 2DB2 ACC3 9B11 0726 2763 AAB6 \
+    55CC 2860 4F4F 331B EB6A 20C7 5DCF 889C 0480 5AC2 FD91 AA51 C873 F597 \
+    7854 7159 6E43 C052 A0F4 CCA7 D823 17EE EDA8"
+# FEATURE END 
+################################################################################
+# FEATURE START 
+# This is license file for Questasim*-Intel FPGA Starter Edition 
+# Number of seat licenses is 1 
+# License Expires 20-Jul-2026 
+DAEMON mgcld path_to_mgcld
+INCREMENT intelqsimstarter mgcld 2026.07 20-jul-2026 uncounted \
+    BF8ACDD48BD6456DF4F4 VENDOR_STRING=D9B0C1CC HOSTID=9c6b002b4ba6 \
+    ISSUER=Intel SN=198396365 SIGN2="1055 52F1 D0FD 7680 B204 9D18 9523 \
+    ABB9 4807 55DA 2045 B429 737E 6193 616C 1EA7 2EAA FBEE A7F4 99C2 7B08 \
+    F913 6488 4152 0CE2 D9E2 E0FB 67F3 39C9 335D"
+# FEATURE END 
+################################################################################
+# End of Intel Corporation Software and/or Intellectual Property License File. Issued 07/20/2025

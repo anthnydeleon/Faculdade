@@ -1,34 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// Questão 13. Considere uma sequência formada pelos caracteres ‘(‘ e ‘)‘. Dizemos que uma sequên-
-// cia de parênteses é válida se:
-// 1. Cada parêntese de abertura ‘(‘ possui um parêntese de fechamento ‘)‘ correspondente.
-// 2. Em qualquer prefixo da sequência, o número de parênteses de fechamento ‘)‘ nunca excede o
-// número de parênteses de abertura ‘(‘.
 
-void verifica_parenteses(char string[], int posicao, int fim, int fechar) {
-  if (fechar < 0) {
-    printf("Sequencia invalida!\n");
-    return;
-  }
+int confere_parenteses(char string[], int pos, int abriu, int tamanho) {
+    if (abriu < 0) return 0;
+    if (string[pos] == '(') abriu++;
+    if (string[pos] == ')') abriu--;
 
-  if (posicao > fim) {
-    if (fechar == 0) printf("Sequencia valida!\n");
-    else printf("Sequencia invalida!\n");
-    return;
-  }
+    if (pos == tamanho) { 
+      if (abriu == 0) return 1;
+      else return 0;      
+    }
 
-  if (string[posicao] == '(') fechar++;
-  if (string[posicao] == ')') fechar--;
-
-  verifica_parenteses(string, posicao + 1, fim, fechar);
+    confere_parenteses(string, pos+1, abriu, tamanho);
 }
 
+
 int main () {
-  char string[4] = {'(', ')', '(', ')'};
-  int len = strlen(string);
-  verifica_parenteses(string, 0, len-1, 0);
+  char string[6] = {'(', ')', '(', '(', ')', ')'};
+
+  int result = confere_parenteses(string, 0, 0, 5);
+  (result == 1) ? printf("certo"): printf("errado");
 
   return 0;
 }
