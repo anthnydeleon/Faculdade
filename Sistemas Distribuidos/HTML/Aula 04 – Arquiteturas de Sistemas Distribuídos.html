@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aula 04 – Arquiteturas de Sistemas Distribuídos</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#fbfbfa;--fg:#1f2328;--muted:#656d76;--line:#e3e5e8;--accent:#1f5fbf;--soft:#eef3fb}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}}
+:root[data-theme="dark"]{--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:24px 18px 64px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:24px}
+nav button{font:inherit;background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+nav button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent);font-weight:600}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2{font-size:1.15rem;margin:32px 0 8px}
+h3{font-size:1rem;margin:20px 0 6px}
+p,ul,ol{margin:8px 0}
+ul,ol{padding-left:22px}
+blockquote{margin:12px 0;padding:8px 14px;background:var(--soft);border-left:3px solid var(--accent)}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted)}
+.note{color:var(--muted);font-size:.93rem}
+[hidden]{display:none!important}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;background:none;border:1px solid var(--line);color:var(--fg);padding:6px 12px;border-radius:6px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.q{padding:18px 0;border-bottom:1px solid var(--line)}
+.q p.t{margin:0 0 10px;font-weight:600}
+.ans{margin-top:12px;padding:10px 14px;background:var(--soft);border-radius:6px}
+.ans p{margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Arquiteturas de Sistemas Distribuídos</h1>
+<p class="sub">Aula 04 · Sistemas Distribuídos · UFABC</p>
+
+<nav role="tablist">
+<button role="tab" id="t-res" aria-selected="true" aria-controls="p-res">Resumo</button>
+<button role="tab" id="t-exe" aria-selected="false" aria-controls="p-exe">Exercícios</button>
+</nav>
+
+<section id="p-res" role="tabpanel" aria-labelledby="t-res">
+<h2>1. Estilos arquiteturais</h2>
+<p>Um estilo é um conjunto de componentes interligados que interagem entre si.</p>
+<div class="table-wrap"><table><tr><th>Estilo</th><th>Ideia</th><th>Exemplo</th></tr><tr><td>Camadas</td><td>Componentes logicamente diferentes, distribuídos entre máquinas. O fluxo de requisição desce e o de resposta sobe.</td><td>Cliente-servidor; buscador com camadas de interface, processamento e dados</td></tr><tr><td>Objetos</td><td>Objetos distribuídos. Chamadas parecem locais, mas podem ser a objetos remotos.</td><td>Java RMI, microsserviços</td></tr><tr><td>Eventos e dados</td><td>Desacoplam os processos. Publish/subscribe: desacoplado na referência (anônimos). Espaço de dados compartilhados: desacoplado na referência e no tempo.</td><td>Barramento de eventos; Linda/Rinda</td></tr><tr><td>Recursos</td><td>Coleção de recursos gerenciados por componentes (REST). Identificação por nome único, mesma interface em todos os serviços, serviço sem memória do chamador.</td><td>Amazon S3</td></tr></table></div>
+<h3>REST: operações básicas</h3>
+<div class="table-wrap"><table><tr><th>Operação</th><th>Descrição</th></tr><tr><td>PUT</td><td>Cria um novo recurso</td></tr><tr><td>GET</td><td>Recupera o estado de um recurso</td></tr><tr><td>DELETE</td><td>Apaga um recurso</td></tr><tr><td>POST</td><td>Modifica um recurso ao transferir um novo estado</td></tr></table></div>
+<p>No S3, objetos ficam em buckets, com URI do tipo <code>http://BucketName.s3.amazonaws.com/ObjectName</code>. Criar usa PUT, listar usa GET no bucket e ler usa GET na URI completa.</p>
+
+<h2>2. Arquiteturas de software</h2>
+<h3>Centralizadas e multicamadas</h3>
+<ul><li><b>Cliente-servidor</b> (desde os anos 70): servidores oferecem serviços, clientes os usam, em máquinas possivelmente diferentes, com requisição e resposta. Um processo pode ser cliente e servidor ao mesmo tempo.</li><li><b>Três camadas lógicas:</b> apresentação (interface), negócio (aplicação) e dados (banco).</li><li><b>Camadas físicas:</b> uma (terminal burro e mainframe), duas (cliente e servidor único) ou três (cada camada em uma máquina).</li></ul>
+<h3>Descentralizadas (P2P)</h3>
+<div class="table-wrap"><table><tr><th>Tipo</th><th>Como funciona</th></tr><tr><td>Estruturado</td><td>Nós organizados em uma estrutura distribuída específica (anel, árvore, tabela de hash). Cada peer é cliente e servidor. Cada nó fica responsável por chaves, e a operação LOOKUP(key) roteia até o nó correto.</td></tr><tr><td>Não estruturado</td><td>Cada nó mantém uma visão parcial com c vizinhos e troca informações periodicamente (gossip). Busca por flooding e random walk. Superpeers podem manter índices, monitorar a rede ou configurar conexões (ex.: Skype).</td></tr><tr><td>Híbrido</td><td>Alguns nós têm funções especiais, ou mistura de cliente-servidor com P2P.</td></tr></table></div>
+<p>Quase todos são redes overlay: os dados seguem conexões definidas pelos nós.</p>
+<h3>Híbridas</h3>
+<ul><li><b>Edge e CDN:</b> servidores de borda levam o conteúdo para perto do cliente.</li><li><b>BitTorrent:</b> o cliente obtém um arquivo .torrent, consulta o tracker (lista de nós que guardam o arquivo) e entra em um swarm. Ali recebe pedaços em paralelo e os redistribui.</li></ul>
+
+<h2>3. Arquitetura versus middleware</h2>
+<p>O estilo escolhido pode não ser o melhor em todos os casos. O middleware permite adaptar o comportamento dinamicamente.</p>
+<ul><li><b>Interceptors:</b> interceptam o fluxo normal quando um objeto remoto é invocado, no nível da requisição ou da mensagem.</li><li><b>Wrappers e brokers:</b> conectam aplicações diferentes para acessar suas funcionalidades.</li></ul>
+<p class="note">Os slides também citam estilos de Mark Richards e microsserviços como leitura complementar.</p>
+</section>
+
+<section id="p-exe" role="tabpanel" aria-labelledby="t-exe" hidden>
+<div class="bar">
+<span class="note">10 perguntas</span>
+<button class="btn" id="all" type="button">Mostrar todas as respostas</button>
+</div>
+<div id="list"></div>
+</section>
+</main>
+
+<script>
+var Q=[["Quais são os quatro estilos arquiteturais da aula? Dê uma ideia central de cada.", "<ul><li>Camadas: componentes organizados em níveis, com fluxo de requisição e resposta.</li><li>Objetos: objetos distribuídos, chamadas que parecem locais.</li><li>Eventos e dados: desacoplam processos.</li><li>Recursos: coleção de recursos com interface uniforme (REST).</li></ul>"], ["Qual a diferença de acoplamento entre publish/subscribe e espaço de dados compartilhados?", "<p>Publish/subscribe é desacoplado na referência: os processos são anônimos entre si. O espaço de dados compartilhados é desacoplado na referência e no tempo: produtor e consumidor nem precisam estar ativos ao mesmo tempo.</p>"], ["Quais são as três propriedades do estilo REST apresentadas e as quatro operações básicas?", "<p>Recursos identificados por um esquema único de nomes; todos os serviços com a mesma interface; o componente esquece quem chamou após a operação (sem estado). Operações: PUT (cria), GET (recupera), DELETE (apaga), POST (modifica).</p>"], ["Descreva as três camadas lógicas de uma aplicação e as configurações físicas possíveis.", "<p>Apresentação (interface), negócio (aplicação) e dados (banco). Fisicamente podem estar em uma máquina (terminal burro e mainframe), em duas (cliente e servidor) ou em três (cada camada separada).</p>"], ["Compare P2P estruturado, não estruturado e híbrido.", "<p>Estruturado: nós seguem uma estrutura definida, como um anel, e a busca usa LOOKUP(key). Não estruturado: vizinhos escolhidos aleatoriamente, busca por flooding ou random walk. Híbrido: alguns nós têm funções especiais, ou combina cliente-servidor com P2P.</p>"], ["Como funciona o LOOKUP em um P2P estruturado em anel?", "<p>Cada nó é responsável por um conjunto de chaves, definido pelos IDs. Uma requisição é roteada pelas conexões lógicas do anel até o nó responsável pela chave.</p>"], ["Para que servem os superpeers? Dê dois usos.", "<p>São nós escolhidos para tarefas específicas. Exemplos do slide: manter um índice para buscas, monitorar o estado da rede e configurar conexões, como no Skype.</p>"], ["Como o BitTorrent combina cliente-servidor com P2P?", "<p>Parte cliente-servidor: um servidor web fornece o .torrent e um tracker informa os nós que têm o arquivo. Parte P2P: o cliente entra em um swarm, recebe pedaços em paralelo e os redistribui aos outros.</p>"], ["O que é um interceptor e em que níveis ele atua?", "<p>É um mecanismo do middleware que intercepta o fluxo normal de controle quando um objeto remoto é invocado. Atua no nível da requisição e no nível da mensagem.</p>"], ["Qual a diferença entre wrapper e broker?", "<p>Ambos conectam aplicações diferentes para acessar suas funcionalidades. O slide só os apresenta como soluções possíveis. A distinção a seguir é minha: o wrapper adapta a interface de uma aplicação, e o broker, componente central, faz a mediação entre várias (como na aula 06).</p>"]];
+var list=document.getElementById('list'),allBtn=document.getElementById('all');
+Q.forEach(function(q,i){
+  var d=document.createElement('div');d.className='q';
+  d.innerHTML='<p class="t">'+(i+1)+'. '+q[0]+'</p><button class="btn tg" type="button" aria-expanded="false">Mostrar resposta</button><div class="ans" hidden>'+q[1]+'</div>';
+  list.appendChild(d);
+});
+function setOne(d,show){
+  var a=d.querySelector('.ans'),b=d.querySelector('.tg');
+  a.hidden=!show;b.textContent=show?'Esconder resposta':'Mostrar resposta';b.setAttribute('aria-expanded',show);
+}
+function sync(){
+  var all=[].every.call(list.children,function(d){return !d.querySelector('.ans').hidden});
+  allBtn.textContent=all?'Esconder todas as respostas':'Mostrar todas as respostas';
+}
+list.addEventListener('click',function(e){
+  var b=e.target.closest('.tg');if(!b)return;
+  var d=b.parentNode;setOne(d,d.querySelector('.ans').hidden);sync();
+});
+allBtn.addEventListener('click',function(){
+  var show=allBtn.textContent.indexOf('Mostrar')===0;
+  [].forEach.call(list.children,function(d){setOne(d,show)});sync();
+});
+var tabs=[['t-res','p-res'],['t-exe','p-exe']];
+tabs.forEach(function(t){
+  document.getElementById(t[0]).addEventListener('click',function(){
+    tabs.forEach(function(u){
+      var on=u[0]===t[0];
+      document.getElementById(u[0]).setAttribute('aria-selected',on);
+      document.getElementById(u[1]).hidden=!on;
+    });
+    window.scrollTo(0,0);
+  });
+});
+</script>
+</body>
+</html>

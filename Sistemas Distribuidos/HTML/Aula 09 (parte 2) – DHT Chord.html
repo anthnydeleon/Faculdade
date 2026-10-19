@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aula 09 (parte 2) – DHT Chord</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#fbfbfa;--fg:#1f2328;--muted:#656d76;--line:#e3e5e8;--accent:#1f5fbf;--soft:#eef3fb}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}}
+:root[data-theme="dark"]{--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:24px 18px 64px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:24px}
+nav button{font:inherit;background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+nav button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent);font-weight:600}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2{font-size:1.15rem;margin:32px 0 8px}
+h3{font-size:1rem;margin:20px 0 6px}
+p,ul,ol{margin:8px 0}
+ul,ol{padding-left:22px}
+blockquote{margin:12px 0;padding:8px 14px;background:var(--soft);border-left:3px solid var(--accent)}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted)}
+.note{color:var(--muted);font-size:.93rem}
+[hidden]{display:none!important}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;background:none;border:1px solid var(--line);color:var(--fg);padding:6px 12px;border-radius:6px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.q{padding:18px 0;border-bottom:1px solid var(--line)}
+.q p.t{margin:0 0 10px;font-weight:600}
+.ans{margin-top:12px;padding:10px 14px;background:var(--soft);border-radius:6px}
+.ans p{margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>DHT Chord</h1>
+<p class="sub">Aula 09 (parte 2) · Sistemas Distribuídos · UFABC</p>
+
+<nav role="tablist">
+<button role="tab" id="t-res" aria-selected="true" aria-controls="p-res">Resumo</button>
+<button role="tab" id="t-exe" aria-selected="false" aria-controls="p-exe">Exercícios</button>
+</nav>
+
+<section id="p-res" role="tabpanel" aria-labelledby="t-res">
+<h2>1. Tabela de hash distribuída (DHT)</h2>
+<ul><li>Sistema P2P estruturado: cada peer é cliente e servidor.</li><li>Criada em 2001 para achar um recurso com eficiência, em O(log N).</li><li>Dá escalabilidade de tamanho e particionamento (sharding).</li><li>Evita o ponto único de falha (SPoF).</li></ul>
+<p>Ideia: uma tabela de hash em um só servidor vira um SPoF se ele cair. A solução é distribuir a tabela por vários nós.</p>
+
+<h2>2. Construção do Chord</h2>
+<p>Três decisões: (1) definir um espaço comum de valores para nós e itens; (2) conectar os nós com poucos links, para minimizar saltos; (3) definir como designar itens aos nós.</p>
+<ul><li><b>Espaço de IDs:</b> {0, 1, ..., 2<sup>M</sup>-1}, formando um anel módulo 2<sup>M</sup>.</li><li><b>Nós:</b> cada nó recebe um número obtido por uma função de hash H.</li><li><b>Responsabilidade:</b> cada nó cuida de um conjunto disjunto de IDs, de (ID do nó anterior + 1) até o seu. No exemplo com M=4 e nós 0, 2, 5, 6, 11: o nó 0 cuida de [12, 0], o nó 5 de [3, 5] e o nó 11 de [7, 11]. É o particionamento.</li><li><b>Sucessor:</b> succ(x) é o primeiro nó, no sentido horário, com id &ge; x. Exemplo: succ(12) = 0, succ(1) = 2, succ(6) = 6.</li><li><b>Ligação:</b> cada nó p aponta para succ(p+1). Invariante: um nó sempre tem conexão com seu sucessor.</li></ul>
+
+<h2>3. Armazenar itens</h2>
+<p>Cada item &lt;key, value&gt; recebe o identificador k = H(key), com a mesma função H, e é guardado no <b>sucessor</b> de k. Exemplo dos slides: H('Seif') = 9, então o item fica no nó 11. H('Fatemeh') = 12 e H('Sarunas') = 14 vão para o nó 0. H('Cosmin') = 2 fica no nó 2. H('Tallat') = 4 vai para o nó 5.</p>
+<p><b>Consistent hashing:</b> técnica em que só O(m/N) pares chave-valor são transferidos quando nós entram ou saem (m chaves, N nós). O slide pergunta qual seria o problema de guardar o item no nó H(key) % N.</p>
+
+<h2>4. Busca</h2>
+<p>Para buscar a chave k, pergunta-se a qualquer nó, calcula-se H(k) e seguem-se os ponteiros de sucessor até achar. Exemplo: get('Seif') a partir do nó 2 passa pelos nós 2, 5, 6 e 11 e devolve "Stockholm". Só com sucessores, a busca é O(N).</p>
+<h3>Algoritmo findSuccessor</h3>
+<ul><li>Se o id está em (predecessor, n], o nó n é a resposta.</li><li>Se o id está em (n, sucessor], o sucessor é a resposta.</li><li>Senão, encaminha a pergunta pelo anel (versão simples) ou ao nó mais próximo anterior ao id (com finger table).</li></ul>
+<p><code>put</code> e <code>get</code> usam findSuccessor. Quando a resposta chega, o iniciador pede ao nó achado que guarde (<code>store</code>) ou devolva (<code>retrieve</code>) o valor. Notação: (a, b] exclui a e inclui b.</p>
+
+<h2>5. Buscas rápidas com finger table</h2>
+<p>Cada nó p aponta para succ(p+1), succ(p+2), succ(p+4), ..., succ(p+2<sup>M-1</sup>). Assim, <code>FT_p[i] = succ(p + 2^(i-1))</code>, para i = 1..M. A tabela tem M entradas, e o espaço guarda 2<sup>M</sup> chaves. Qualquer nó alcança outro em cerca de log<sub>2</sub>(N) saltos. Exemplo do slide: log<sub>2</sub>(1.000.000) é cerca de 20. Em implementações, normalmente M = 128.</p>
+<p><b>closestPrecedingNode(id):</b> percorre a finger table de i = M até 1 e devolve a primeira entrada que está no intervalo (n, id). Se nenhuma estiver, devolve o próprio n.</p>
+<h3>Exemplo: finger table do nó 0 (M=4, nós 0, 2, 5, 6, 11)</h3>
+<div class="table-wrap"><table><tr><th>i</th><th>n + 2^(i-1)</th><th>succ</th></tr><tr><td>1</td><td>0 + 1 = 1</td><td>2</td></tr><tr><td>2</td><td>0 + 2 = 2</td><td>2</td></tr><tr><td>3</td><td>0 + 4 = 4</td><td>5</td></tr><tr><td>4</td><td>0 + 8 = 8</td><td>11</td></tr></table></div>
+<h3>Exemplo: get(15) a partir do nó 1</h3>
+<p>Conforme as tabelas dos slides (M=4):</p>
+<div class="table-wrap"><table><tr><th>Nó</th><th>Finger table</th><th>Próximo salto</th></tr><tr><td>1</td><td>[3, 3, 6, 9]</td><td>Nó 9: o mais distante que ainda precede 15</td></tr><tr><td>9</td><td>[10, 14, 14, 1]</td><td>Nó 14</td></tr><tr><td>14</td><td>[15, 0, 3, 6]</td><td>15 está em (14, sucessor=15], então o sucessor 15 responde</td></tr></table></div>
+<p>Foram 3 saltos, em vez de percorrer todos os nós pelo anel.</p>
+</section>
+
+<section id="p-exe" role="tabpanel" aria-labelledby="t-exe" hidden>
+<div class="bar">
+<span class="note">13 perguntas</span>
+<button class="btn" id="all" type="button">Mostrar todas as respostas</button>
+</div>
+<div id="list"></div>
+</section>
+</main>
+
+<script>
+var Q=[["O que é uma DHT e que problema ela resolve?", "<p>É uma tabela de hash distribuída por vários nós em um sistema P2P estruturado. Evita o ponto único de falha (SPoF) de uma tabela em um só servidor e dá escalabilidade e particionamento, com busca eficiente em O(log N).</p>"], ["Como cada nó e cada item recebem posição no anel do Chord?", "<p>Ambos usam a mesma função de hash H sobre o espaço {0, ..., 2^M - 1}. O nó recebe H(identificação do nó) e o item recebe H(key).</p>"], ["Em um anel M=4 com nós 0, 2, 5, 6 e 11, que IDs cada nó cuida?", "<p>Cada nó cuida de (ID do anterior + 1) até o seu. Nó 0: [12, 0]. Nó 2: [1, 2]. Nó 5: [3, 5]. Nó 6: [6, 6]. Nó 11: [7, 11]. (Os intervalos de 0, 5 e 11 aparecem nos slides. Calculei os de 2 e 6 com a mesma regra.)</p>"], ["Neste mesmo anel, calcule succ(12), succ(1) e succ(6).", "<p>succ(12) = 0, pois o primeiro nó com id &ge; 12 dando a volta no anel é o 0. succ(1) = 2. succ(6) = 6. (Os três valores estão nos slides.)</p>"], ["Em que nó ficam H('Seif') = 9 e H('Tallat') = 4 neste anel?", "<p>Cada item vai para o sucessor da sua chave: 9 vai para o nó 11 e 4 vai para o nó 5.</p>"], ["O que é consistent hashing e qual seu benefício?", "<p>É a técnica que o Chord usa para designar chaves a nós. Quando nós entram ou saem, só O(m/N) pares chave-valor mudam de nó (m chaves, N nós).</p>"], ["Qual o problema de guardar o item no nó H(key) % N em vez de usar consistent hashing?", "<p>O slide só faz a pergunta. Resposta minha: quando N muda, o resultado de H(key) % N muda para a maioria das chaves, então quase todos os itens teriam de ser movidos a cada entrada ou saída de nó. Com consistent hashing, só uma fração pequena (cerca de m/N) se move.</p>"], ["Por que a busca só com ponteiros de sucessor é O(N)?", "<p>Cada salto avança só um nó no anel. No pior caso, a requisição percorre quase todos os N nós até achar o responsável pela chave.</p>"], ["Como é definida a finger table? Qual seu tamanho?", "<p>FT_p[i] = succ(p + 2^(i-1)), para i = 1..M. Ou seja, succ(p+1), succ(p+2), succ(p+4), succ(p+8)... Tem M entradas.</p>"], ["Monte a finger table do nó 5 no anel M=4 com nós 0, 2, 5, 6 e 11.", "<p>i=1: 5+1=6, succ(6)=6. i=2: 5+2=7, succ(7)=11. i=3: 5+4=9, succ(9)=11. i=4: 5+8=13, succ(13)=0. Tabela: [6, 11, 11, 0]. (Exercício novo, calculado com a fórmula dos slides.)</p>"], ["Por que o log2 é importante? Quantos saltos aproximados para 1 milhão de nós?", "<p>O número de saltos cresce muito devagar com N. Para 1.000.000 de nós, log2 é cerca de 20 saltos, segundo o slide.</p>"], ["O que faz closestPrecedingNode(id)?", "<p>Percorre a finger table do último índice (M) ao primeiro e devolve a primeira entrada que está no intervalo (n, id). Se nenhuma estiver, devolve o próprio nó. Assim a busca dá o maior salto possível sem passar do id.</p>"], ["Refaça o get(15) a partir do nó 1 com as finger tables dos slides e conte os saltos.", "<p>Nó 1 tem [3, 3, 6, 9]. O mais distante antes de 15 é 9. Nó 9 tem [10, 14, 14, 1]. O mais distante antes de 15 é 14. Nó 14 tem [15, 0, 3, 6]. Como 15 está em (14, 15], o sucessor 15 responde. Caminho: 1, 9, 14, 15 (3 saltos).</p>"]];
+var list=document.getElementById('list'),allBtn=document.getElementById('all');
+Q.forEach(function(q,i){
+  var d=document.createElement('div');d.className='q';
+  d.innerHTML='<p class="t">'+(i+1)+'. '+q[0]+'</p><button class="btn tg" type="button" aria-expanded="false">Mostrar resposta</button><div class="ans" hidden>'+q[1]+'</div>';
+  list.appendChild(d);
+});
+function setOne(d,show){
+  var a=d.querySelector('.ans'),b=d.querySelector('.tg');
+  a.hidden=!show;b.textContent=show?'Esconder resposta':'Mostrar resposta';b.setAttribute('aria-expanded',show);
+}
+function sync(){
+  var all=[].every.call(list.children,function(d){return !d.querySelector('.ans').hidden});
+  allBtn.textContent=all?'Esconder todas as respostas':'Mostrar todas as respostas';
+}
+list.addEventListener('click',function(e){
+  var b=e.target.closest('.tg');if(!b)return;
+  var d=b.parentNode;setOne(d,d.querySelector('.ans').hidden);sync();
+});
+allBtn.addEventListener('click',function(){
+  var show=allBtn.textContent.indexOf('Mostrar')===0;
+  [].forEach.call(list.children,function(d){setOne(d,show)});sync();
+});
+var tabs=[['t-res','p-res'],['t-exe','p-exe']];
+tabs.forEach(function(t){
+  document.getElementById(t[0]).addEventListener('click',function(){
+    tabs.forEach(function(u){
+      var on=u[0]===t[0];
+      document.getElementById(u[0]).setAttribute('aria-selected',on);
+      document.getElementById(u[1]).hidden=!on;
+    });
+    window.scrollTo(0,0);
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aula 03 – Tipos de Sistemas Distribuídos</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#fbfbfa;--fg:#1f2328;--muted:#656d76;--line:#e3e5e8;--accent:#1f5fbf;--soft:#eef3fb}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}}
+:root[data-theme="dark"]{--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:24px 18px 64px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:24px}
+nav button{font:inherit;background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+nav button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent);font-weight:600}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2{font-size:1.15rem;margin:32px 0 8px}
+h3{font-size:1rem;margin:20px 0 6px}
+p,ul,ol{margin:8px 0}
+ul,ol{padding-left:22px}
+blockquote{margin:12px 0;padding:8px 14px;background:var(--soft);border-left:3px solid var(--accent)}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted)}
+.note{color:var(--muted);font-size:.93rem}
+[hidden]{display:none!important}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;background:none;border:1px solid var(--line);color:var(--fg);padding:6px 12px;border-radius:6px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.q{padding:18px 0;border-bottom:1px solid var(--line)}
+.q p.t{margin:0 0 10px;font-weight:600}
+.ans{margin-top:12px;padding:10px 14px;background:var(--soft);border-radius:6px}
+.ans p{margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Tipos de Sistemas Distribuídos</h1>
+<p class="sub">Aula 03 · Sistemas Distribuídos · UFABC</p>
+
+<nav role="tablist">
+<button role="tab" id="t-res" aria-selected="true" aria-controls="p-res">Resumo</button>
+<button role="tab" id="t-exe" aria-selected="false" aria-controls="p-exe">Exercícios</button>
+</nav>
+
+<section id="p-res" role="tabpanel" aria-labelledby="t-res">
+<h2>1. Visão geral</h2>
+<ul><li>Sistemas para computação distribuída de alto desempenho: cluster, grade e nuvem.</li><li>Sistemas de informação distribuídos.</li><li>Sistemas distribuídos para computação pervasiva.</li></ul>
+
+<h2>2. Computação de alto desempenho</h2>
+<div class="table-wrap"><table><tr><th>Tipo</th><th>Características</th></tr><tr><td>Cluster</td><td>Computadores de boa qualidade ligados por LAN. Homogêneo (mesmo SO, hardware quase idêntico). Um único nó gerenciador (master) e vários nós de computação.</td></tr><tr><td>Grade</td><td>Nós heterogêneos, espalhados entre organizações ou pessoas, em geral em rede de longa distância. Usa organizações virtuais: IDs de usuários agrupados com autorização para usar certos recursos.</td></tr><tr><td>Nuvem</td><td>Recursos oferecidos em quatro camadas (abaixo).</td></tr></table></div>
+<h3>Camadas da nuvem</h3>
+<div class="table-wrap"><table><tr><th>Camada</th><th>O que cobre</th><th>Exemplo</th></tr><tr><td>Hardware</td><td>Processadores, roteadores, energia, refrigeração (escondido do cliente)</td><td>Datacenters</td></tr><tr><td>Infraestrutura (IaaS)</td><td>Virtualização para alocar servidores e armazenamento virtuais</td><td>Amazon EC2</td></tr><tr><td>Plataforma (PaaS)</td><td>Abstrações de alto nível para serviços</td><td>MS Azure, Amazon S3</td></tr><tr><td>Aplicação (SaaS)</td><td>As aplicações em si</td><td>Google Apps, YouTube</td></tr></table></div>
+
+<h2>3. Sistemas de informação distribuídos</h2>
+<p>As palavras-chave são <b>transação</b> e <b>integração</b>. Muitas aplicações dessa classe se conectam à rede para trocar informações.</p>
+<h3>Transações e ACID</h3>
+<p>Uma transação é uma operação atômica. Se algo falhar, ela é abortada (ABORT_TRANSACTION). O exemplo do slide atualiza dois bancos independentes (companhia aérea e hotel) como subtransações aninhadas.</p>
+<div class="table-wrap"><table><tr><th>Propriedade</th><th>Significado</th></tr><tr><td>Atomicidade</td><td>Todas as operações têm sucesso ou todas falham. Em falha, o estado fica inalterado.</td></tr><tr><td>Consistência</td><td>A transação leva a um estado válido. Estados intermediários inválidos podem existir durante a execução.</td></tr><tr><td>Isolamento</td><td>Transações concorrentes não interferem. Para uma transação T, as outras ocorrem antes ou depois de T.</td></tr><tr><td>Durabilidade</td><td>Depois do término, os efeitos são permanentes e sobrevivem a falhas.</td></tr></table></div>
+<p><b>TP Monitor:</b> quando os dados de uma transação estão em vários servidores, o monitor coordena a execução.</p>
+<h3>Integração de aplicações (EAI)</h3>
+<p>Um TP Monitor não basta. Aplicações precisam se comunicar diretamente, via middleware de comunicação:</p>
+<ul><li><b>RPC:</b> o cliente chama o método como se fosse local, mas ele pode rodar em outra máquina. Exemplos: Java RMI e gRPC. Um <b>proxy</b> encaminha as requisições ao servidor responsável.</li><li><b>MOM</b> (middleware orientado a mensagens).</li></ul>
+
+<h2>4. Sistemas pervasivos</h2>
+<p>Tendência em que os nós são pequenos, móveis e embutidos em sistemas maiores. Ligados à Internet das Coisas (IoT). Os três tipos se sobrepõem.</p>
+<div class="table-wrap"><table><tr><th>Tipo</th><th>Pontos principais</th></tr><tr><td>Ubíquos</td><td>Sempre presentes. Requisitos: mudança contextual, autonomia (sem intervenção humana) e inteligência (comportamento emergente, como o flocking).</td></tr><tr><td>Móveis</td><td>Smartphones, tablets, óculos AR/VR. Comunicação sem fio. A localização muda, então a palavra-chave é descoberta. Rotas instáveis levam às redes tolerantes a disrupções. Estudos de rastreamento de celulares mostram que as pessoas tendem a voltar aos mesmos lugares.</td></tr><tr><td>Sensores</td><td>Muitos nós (dezenas a milhares), simples (pouca memória, computação e comunicação) e em geral com bateria. Sentem e atuam no ambiente.</td></tr></table></div>
+<p><b>Rede de sensores como sistema distribuído:</b> (a) os dados vão direto ao operador, ou (b) cada sensor processa e armazena dados e envia só respostas a consultas.</p>
+<p>Visão final do slide: Cloud, Edge e Things.</p>
+</section>
+
+<section id="p-exe" role="tabpanel" aria-labelledby="t-exe" hidden>
+<div class="bar">
+<span class="note">9 perguntas</span>
+<button class="btn" id="all" type="button">Mostrar todas as respostas</button>
+</div>
+<div id="list"></div>
+</section>
+</main>
+
+<script>
+var Q=[["Compare cluster e grade em homogeneidade, localização e gerenciamento.", "<p><b>Cluster:</b> homogêneo, nós ligados por LAN, um único nó gerenciador.</p><p><b>Grade:</b> heterogênea, nós em várias organizações, normalmente em WAN, com organizações virtuais para controlar quem usa quais recursos.</p>"], ["O que é uma organização virtual em uma grade?", "<p>É um agrupamento de usuários (mais exatamente, de seus IDs) que têm autorização para usar certos recursos. Permite colaboração entre organizações diferentes.</p>"], ["Relacione IaaS, PaaS e SaaS às camadas da nuvem e dê um exemplo de cada.", "<p>IaaS cobre hardware e infraestrutura (ex.: Amazon EC2). PaaS cobre a plataforma (ex.: Amazon S3, MS Azure). SaaS cobre a aplicação (ex.: Google Apps).</p>"], ["Explique as quatro propriedades ACID.", "<ul><li>Atomicidade: tudo ou nada.</li><li>Consistência: a transação leva a um estado válido.</li><li>Isolamento: transações concorrentes não interferem entre si.</li><li>Durabilidade: efeitos permanentes após o término.</li></ul>"], ["No exemplo do slide (reserva de voo e hotel), por que a transação é aninhada e o que acontece se a escrita no banco do voo falha?", "<p>Cada banco é independente e recebe uma subtransação. Se a escrita no banco do voo não é feita (updated é falso), o código executa ABORT_TRANSACTION e nada é gravado no hotel. Isso preserva a atomicidade.</p>"], ["Para que serve um TP Monitor e por que ele não basta para integrar aplicações?", "<p>Ele coordena a execução de uma transação quando os dados estão em vários servidores. Não basta porque as aplicações também precisam se comunicar diretamente, o que leva ao EAI, com RPC e MOM.</p>"], ["O que é um proxy no contexto de RPC?", "<p>É o componente que encaminha as requisições do cliente ao servidor responsável. O cliente chama o método como se fosse local.</p>"], ["Quais são os três tipos de sistemas pervasivos e uma característica de cada?", "<p>Ubíquos: autonomia e comportamento emergente. Móveis: localização que muda e necessidade de descoberta. Sensores: muitos nós simples, normalmente com bateria.</p>"], ["Por que redes de sensores podem processar dados nos próprios sensores? Qual a vantagem?", "<p>No modelo (b) do slide, cada sensor processa e armazena dados e envia só as respostas às consultas. A vantagem, que é uma dedução minha a partir do desenho, é enviar menos dados pela rede, algo importante para nós com bateria limitada.</p>"]];
+var list=document.getElementById('list'),allBtn=document.getElementById('all');
+Q.forEach(function(q,i){
+  var d=document.createElement('div');d.className='q';
+  d.innerHTML='<p class="t">'+(i+1)+'. '+q[0]+'</p><button class="btn tg" type="button" aria-expanded="false">Mostrar resposta</button><div class="ans" hidden>'+q[1]+'</div>';
+  list.appendChild(d);
+});
+function setOne(d,show){
+  var a=d.querySelector('.ans'),b=d.querySelector('.tg');
+  a.hidden=!show;b.textContent=show?'Esconder resposta':'Mostrar resposta';b.setAttribute('aria-expanded',show);
+}
+function sync(){
+  var all=[].every.call(list.children,function(d){return !d.querySelector('.ans').hidden});
+  allBtn.textContent=all?'Esconder todas as respostas':'Mostrar todas as respostas';
+}
+list.addEventListener('click',function(e){
+  var b=e.target.closest('.tg');if(!b)return;
+  var d=b.parentNode;setOne(d,d.querySelector('.ans').hidden);sync();
+});
+allBtn.addEventListener('click',function(){
+  var show=allBtn.textContent.indexOf('Mostrar')===0;
+  [].forEach.call(list.children,function(d){setOne(d,show)});sync();
+});
+var tabs=[['t-res','p-res'],['t-exe','p-exe']];
+tabs.forEach(function(t){
+  document.getElementById(t[0]).addEventListener('click',function(){
+    tabs.forEach(function(u){
+      var on=u[0]===t[0];
+      document.getElementById(u[0]).setAttribute('aria-selected',on);
+      document.getElementById(u[1]).hidden=!on;
+    });
+    window.scrollTo(0,0);
+  });
+});
+</script>
+</body>
+</html>
