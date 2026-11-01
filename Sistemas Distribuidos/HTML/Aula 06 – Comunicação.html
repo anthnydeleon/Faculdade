@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aula 06 – Comunicação</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#fbfbfa;--fg:#1f2328;--muted:#656d76;--line:#e3e5e8;--accent:#1f5fbf;--soft:#eef3fb}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}}
+:root[data-theme="dark"]{--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:24px 18px 64px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:24px}
+nav button{font:inherit;background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+nav button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent);font-weight:600}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2{font-size:1.15rem;margin:32px 0 8px}
+h3{font-size:1rem;margin:20px 0 6px}
+p,ul,ol{margin:8px 0}
+ul,ol{padding-left:22px}
+blockquote{margin:12px 0;padding:8px 14px;background:var(--soft);border-left:3px solid var(--accent)}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted)}
+.note{color:var(--muted);font-size:.93rem}
+[hidden]{display:none!important}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;background:none;border:1px solid var(--line);color:var(--fg);padding:6px 12px;border-radius:6px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.q{padding:18px 0;border-bottom:1px solid var(--line)}
+.q p.t{margin:0 0 10px;font-weight:600}
+.ans{margin-top:12px;padding:10px 14px;background:var(--soft);border-radius:6px}
+.ans p{margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Comunicação</h1>
+<p class="sub">Aula 06 · Sistemas Distribuídos · UFABC</p>
+
+<nav role="tablist">
+<button role="tab" id="t-res" aria-selected="true" aria-controls="p-res">Resumo</button>
+<button role="tab" id="t-exe" aria-selected="false" aria-controls="p-exe">Exercícios</button>
+</nav>
+
+<section id="p-res" role="tabpanel" aria-labelledby="t-res">
+<h2>1. Fundamentos</h2>
+<p><b>Camadas:</b> baixo nível, transporte, middleware e aplicação. A camada de transporte (TCP e UDP) é a mais usada pelos sistemas distribuídos. TCP é orientado a conexão, confiável e a fluxo. UDP é não confiável (best-effort). IP multicast não deve ser tratado como serviço padrão.</p>
+<p><b>Middleware:</b> oferece protocolos de comunicação, (des)empacotamento (marshaling), nomes, segurança e escalabilidade (replicação, sharding, cache). Sobram os protocolos específicos da aplicação.</p>
+<div class="table-wrap"><table><tr><th>Eixo</th><th>Opção A</th><th>Opção B</th></tr><tr><td>Persistência</td><td>Transiente: o remetente descarta a mensagem se ela não puder ser entregue</td><td>Persistente: a mensagem é guardada até a entrega</td></tr><tr><td>Sincronia</td><td>Síncrona: o remetente espera</td><td>Assíncrona: o remetente continua</td></tr></table></div>
+<p>Pontos de sincronização possíveis: no envio da requisição, na entrega da requisição ou após o processamento.</p>
+
+<h2>2. RPC (chamada a procedimento remoto)</h2>
+<p>Esconde a comunicação atrás de uma chamada de procedimento (transparência de acesso). É precursor dos microsserviços.</p>
+<h3>Passos de uma chamada</h3>
+<ol><li>O cliente chama o stub do cliente.</li><li>O stub empacota os parâmetros e chama o SO local.</li><li>O SO envia a mensagem ao SO remoto, que a entrega ao stub do servidor.</li><li>O stub do servidor desempacota e faz a chamada local.</li><li>O resultado volta pelo mesmo caminho até o cliente.</li></ol>
+<p><b>Concorrência:</b> normalmente usa dispatcher/worker, com uma thread por requisição. Variáveis e estruturas precisam de proteção.</p>
+<div class="table-wrap"><table><tr><th>Variante</th><th>Comportamento</th></tr><tr><td>Síncrona</td><td>O cliente espera o resultado</td></tr><tr><td>Assíncrona (sem resposta)</td><td>O cliente continua após o servidor aceitar a requisição (one-way)</td></tr><tr><td>Síncrona diferida</td><td>O cliente continua e o servidor devolve o resultado depois (callback). O cliente também pode fazer poll.</td></tr><tr><td>Para um grupo</td><td>A mesma requisição vai a vários servidores</td></tr></table></div>
+<p><b>RMI (Java):</b> uma interface estende <code>Remote</code>, a classe estende <code>UnicastRemoteObject</code> e implementa a interface. O servidor cria o registry (<code>createRegistry</code>) e faz <code>bind</code>. O cliente faz <code>lookup</code>.</p>
+<p><b>gRPC (Google, 2015):</b> segundo o slide, mensagens de 3 a 10 vezes menores e envio de 20 a 100 vezes mais rápido que alternativas como REST. Útil para baixa latência, alta escalabilidade e clientes móveis. A interface é definida em arquivo de serviço e mensagens.</p>
+
+<h2>3. Comunicação orientada a mensagens (MOM)</h2>
+<p>Comunicação assíncrona e persistente com filas gerenciadas pelo middleware.</p>
+<div class="table-wrap"><table><tr><th>Operação</th><th>Efeito</th></tr><tr><td>PUT</td><td>Adiciona uma mensagem à fila</td></tr><tr><td>GET</td><td>Bloqueia até haver mensagem e remove a primeira</td></tr><tr><td>POLL</td><td>Verifica se há mensagem, sem bloquear</td></tr><tr><td>NOTIFY</td><td>Instala um tratador chamado a cada nova mensagem</td></tr></table></div>
+<p><b>Message broker:</b> componente centralizado que trata a heterogeneidade (converte formatos) e gerencia as filas.</p>
+<h3>Apache Kafka (LinkedIn, 2012)</h3>
+<ul><li>Usa um <b>event log</b> (append-only), chamado <b>tópico</b>. Cada registro tem um identificador (offset) que captura a ordem.</li><li>O produtor envia eventos de forma assíncrona. Os eventos ficam persistidos e vários consumidores os leem. Cada consumidor indica o log e o offset.</li><li>O broker é stateless em relação às requisições dos clientes.</li><li><b>Escalabilidade:</b> particionamento (sharding) do tópico. O produtor escolhe a partição, em geral pelo hash de uma chave.</li><li><b>Disponibilidade:</b> replicação. Um líder atende leituras e escritas, e N seguidores dão resiliência.</li></ul>
+<p>Números do slide: Slack (2018) com mais de 1 bilhão de mensagens por dia e 16 brokers. PayPal (2022) com 1,3 trilhão de mensagens por dia e 1.500 brokers.</p>
+<p><b>Apache ActiveMQ:</b> modelo ponto a ponto (só um consumidor recebe a mensagem da fila) e modelo publish/subscribe (todos os consumidores recebem).</p>
+
+<h2>4. Multicast</h2>
+<p>No unicast há um destino. No multicast, o emissor envia a mesma mensagem a um grupo. Pode ser feito na rede (difícil) ou no middleware. No middleware, <b>receber</b> vem da rede e <b>entregar</b> é decisão do middleware.</p>
+<div class="table-wrap"><table><tr><th>Ordem</th><th>Regra</th></tr><tr><td>FIFO</td><td>Se um processo p envia m1 e depois m2, todos entregam m1 antes de m2</td></tr><tr><td>Causal</td><td>Se m1 precede causalmente m2, todos entregam m1 antes de m2, não importa quem enviou</td></tr><tr><td>Total</td><td>Se um processo entrega m1 antes de m2, todos entregam nessa mesma ordem</td></tr></table></div>
+
+<h2>5. Gossip e flooding</h2>
+<p>Um nó envia a mensagem a vizinhos (gossip) e cada vizinho a reenvia se ainda não a viu (flooding). Mais conexões significam mais custo.</p>
+<h3>Anti-entropy</h3>
+<p>Cada nó escolhe outro aleatoriamente e troca estado. Variantes: <b>pull</b> (P só pede), <b>push</b> (P só envia) e <b>push-pull</b> (ambos). O push-pull espalha a atualização em O(log N) rodadas.</p>
+<h3>Rumor</h3>
+<p>Um nó com atualização contata outros. Se o contatado já a tem, o nó para com probabilidade p<sub>stop</sub>. A fração s de nós ignorantes segue <code>s = e^(-(1/p_stop + 1)(1 - s))</code>. Com 10.000 nós: 1/p_stop = 1 deixa cerca de 2032 nós sem a atualização, e 1/p_stop = 7 deixa cerca de 3.</p>
+<p>Para garantir que todos os nós sejam atualizados, só o rumor não basta.</p>
+</section>
+
+<section id="p-exe" role="tabpanel" aria-labelledby="t-exe" hidden>
+<div class="bar">
+<span class="note">12 perguntas</span>
+<button class="btn" id="all" type="button">Mostrar todas as respostas</button>
+</div>
+<div id="list"></div>
+</section>
+</main>
+
+<script>
+var Q=[["Diferencie comunicação transiente e persistente, e síncrona e assíncrona.", "<p>Transiente: o remetente descarta a mensagem se não puder entregá-la. Persistente: ela é guardada até a entrega. Síncrona: o remetente espera. Assíncrona: continua sem esperar.</p>"], ["Cite os pontos de sincronização possíveis em uma comunicação.", "<p>No envio da requisição, na entrega da requisição e após o processamento pelo servidor.</p>"], ["Descreva o que acontece, passo a passo, em uma chamada RPC.", "<p>O cliente chama o stub, que empacota os parâmetros e chama o SO. A mensagem vai ao SO remoto e ao stub do servidor, que desempacota e faz a chamada local. O resultado volta pelo mesmo caminho e o stub do cliente o devolve ao cliente.</p>"], ["Compare RPC síncrono, assíncrono e síncrono diferido.", "<p>Síncrono: o cliente espera o resultado. Assíncrono: o cliente continua assim que o servidor aceita, sem resposta. Síncrono diferido: o cliente continua e o resultado chega depois por callback, ou o cliente consulta com poll.</p>"], ["Por que um servidor RMI precisa proteger suas variáveis?", "<p>Normalmente cada requisição é tratada por uma thread diferente (dispatcher/worker). Assim, várias threads podem acessar as mesmas estruturas ao mesmo tempo.</p>"], ["Quais as quatro operações de uma fila em um MOM?", "<p>PUT (adiciona), GET (bloqueia até ter mensagem e remove), POLL (verifica sem bloquear) e NOTIFY (chama um tratador a cada nova mensagem).</p>"], ["Explique como o Kafka consegue escalabilidade e disponibilidade.", "<p>Escalabilidade: o tópico é particionado, e produtores e consumidores paralelizam as requisições. O produtor escolhe a partição, em geral pelo hash de uma chave. Disponibilidade: o tópico é replicado, com um líder que atende leituras e escritas e seguidores que dão resiliência.</p>"], ["Compare o modelo ponto a ponto e o publish/subscribe do ActiveMQ.", "<p>Ponto a ponto: o produtor envia à fila e só um dos consumidores recebe a mensagem. Publish/subscribe: o produtor publica no tópico e todos os consumidores ativos a recebem.</p>"], ["Defina multicast com ordem FIFO, causal e total.", "<p>FIFO: mensagens do mesmo emissor são entregues na ordem de envio. Causal: se m1 precede causalmente m2, todos entregam m1 antes de m2. Total: todos entregam as mensagens na mesma ordem.</p>"], ["Qual a diferença entre receber e entregar em um multicast no middleware?", "<p>Receber é o que chega pela rede, sem controle do middleware. Entregar é repassar a mensagem à aplicação, e o middleware decide quando fazê-lo. Por isso ele pode atrasar a entrega para respeitar a ordem.</p>"], ["Compare pull, push e push-pull no anti-entropy. Qual o custo do push-pull?", "<p>Pull: P pede atualizações a Q. Push: P envia atualizações a Q. Push-pull: os dois trocam. O push-pull usa O(log N) rodadas para atingir os N nós.</p>"], ["No protocolo de rumor, o que acontece quando se aumenta 1/p_stop e por que o rumor sozinho não garante cobertura total?", "<p>A fração s de nós ignorantes cai: com 10.000 nós, vai de cerca de 2032 (1/p_stop = 1) a cerca de 3 (1/p_stop = 7). Ela nunca chega a zero na fórmula, então sempre pode sobrar algum nó sem a atualização.</p>"]];
+var list=document.getElementById('list'),allBtn=document.getElementById('all');
+Q.forEach(function(q,i){
+  var d=document.createElement('div');d.className='q';
+  d.innerHTML='<p class="t">'+(i+1)+'. '+q[0]+'</p><button class="btn tg" type="button" aria-expanded="false">Mostrar resposta</button><div class="ans" hidden>'+q[1]+'</div>';
+  list.appendChild(d);
+});
+function setOne(d,show){
+  var a=d.querySelector('.ans'),b=d.querySelector('.tg');
+  a.hidden=!show;b.textContent=show?'Esconder resposta':'Mostrar resposta';b.setAttribute('aria-expanded',show);
+}
+function sync(){
+  var all=[].every.call(list.children,function(d){return !d.querySelector('.ans').hidden});
+  allBtn.textContent=all?'Esconder todas as respostas':'Mostrar todas as respostas';
+}
+list.addEventListener('click',function(e){
+  var b=e.target.closest('.tg');if(!b)return;
+  var d=b.parentNode;setOne(d,d.querySelector('.ans').hidden);sync();
+});
+allBtn.addEventListener('click',function(){
+  var show=allBtn.textContent.indexOf('Mostrar')===0;
+  [].forEach.call(list.children,function(d){setOne(d,show)});sync();
+});
+var tabs=[['t-res','p-res'],['t-exe','p-exe']];
+tabs.forEach(function(t){
+  document.getElementById(t[0]).addEventListener('click',function(){
+    tabs.forEach(function(u){
+      var on=u[0]===t[0];
+      document.getElementById(u[0]).setAttribute('aria-selected',on);
+      document.getElementById(u[1]).hidden=!on;
+    });
+    window.scrollTo(0,0);
+  });
+});
+</script>
+</body>
+</html>

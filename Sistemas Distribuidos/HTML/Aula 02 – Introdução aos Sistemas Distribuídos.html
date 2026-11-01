@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aula 02 – Introdução aos Sistemas Distribuídos</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#fbfbfa;--fg:#1f2328;--muted:#656d76;--line:#e3e5e8;--accent:#1f5fbf;--soft:#eef3fb}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}}
+:root[data-theme="dark"]{--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:24px 18px 64px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:24px}
+nav button{font:inherit;background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+nav button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent);font-weight:600}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2{font-size:1.15rem;margin:32px 0 8px}
+h3{font-size:1rem;margin:20px 0 6px}
+p,ul,ol{margin:8px 0}
+ul,ol{padding-left:22px}
+blockquote{margin:12px 0;padding:8px 14px;background:var(--soft);border-left:3px solid var(--accent)}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted)}
+.note{color:var(--muted);font-size:.93rem}
+[hidden]{display:none!important}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;background:none;border:1px solid var(--line);color:var(--fg);padding:6px 12px;border-radius:6px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.q{padding:18px 0;border-bottom:1px solid var(--line)}
+.q p.t{margin:0 0 10px;font-weight:600}
+.ans{margin-top:12px;padding:10px 14px;background:var(--soft);border-radius:6px}
+.ans p{margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Introdução aos Sistemas Distribuídos</h1>
+<p class="sub">Aula 02 · Sistemas Distribuídos · UFABC</p>
+
+<nav role="tablist">
+<button role="tab" id="t-res" aria-selected="true" aria-controls="p-res">Resumo</button>
+<button role="tab" id="t-exe" aria-selected="false" aria-controls="p-exe">Exercícios</button>
+</nav>
+
+<section id="p-res" role="tabpanel" aria-labelledby="t-res">
+
+<h2>1. Definição</h2>
+<blockquote>Um sistema distribuído é uma coleção de elementos de computação autônomos que os usuários veem como um sistema único e coerente.</blockquote>
+<ul>
+<li><b>Nós autônomos:</b> dispositivos de hardware ou processos de software, cada um com sua própria percepção de tempo.</li>
+<li><b>Sistema coerente:</b> o usuário vê um só sistema, então os nós precisam colaborar.</li>
+<li><b>Consequência central:</b> não existe relógio global. Isso causa problemas de sincronização e coordenação.</li>
+<li><b>Associação ao grupo:</b> é preciso gerenciar quem participa e saber se você fala com um membro autorizado.</li>
+</ul>
+<p class="note">Analogia: uma orquestra sem maestro e sem relógio na parede. Cada músico tem seu próprio tempo, mas o público precisa ouvir uma só música.</p>
+
+<h2>2. Organização</h2>
+<h3>Redes de overlay</h3>
+<p>Cada nó se comunica só com seus vizinhos. O conjunto de vizinhos pode mudar. A overlay não precisa seguir a estrutura física da rede.</p>
+<div class="table-wrap"><table>
+<tr><th>Tipo</th><th>Como funciona</th><th>Exemplo</th></tr>
+<tr><td>Estruturada</td><td>Cada nó tem vizinhos bem definidos</td><td>Árvore, anel</td></tr>
+<tr><td>Não estruturada</td><td>Cada nó conhece nós escolhidos aleatoriamente</td><td>Peer-to-peer (P2P)</td></tr>
+</table></div>
+<p>Em P2P, a falha de um peer não compromete o sistema.</p>
+<h3>Middleware</h3>
+<p>É o "SO dos sistemas distribuídos". Fica entre os SOs locais e as aplicações. Reúne funções que as aplicações não precisam reimplementar, como replicação, segurança e broadcast.</p>
+
+<h2>3. Objetivos</h2>
+<h3>3.1 Compartilhamento de recursos</h3>
+<p>Arquivos na nuvem, streaming, mensagens, hospedagem web (CDNs), busca e processamento. Frase de John Gage (Sun): "A rede é o computador".</p>
+
+<h3>3.2 Transparência de distribuição</h3>
+<p>Transparência é esconder um aspecto da distribuição.</p>
+<div class="table-wrap"><table>
+<tr><th>Tipo</th><th>O que esconde</th></tr>
+<tr><td>Acesso</td><td>Diferenças de representação de dados e de invocação</td></tr>
+<tr><td>Localização</td><td>Onde o objeto está</td></tr>
+<tr><td>Relocalização</td><td>Que o objeto pode mudar de lugar enquanto está em uso</td></tr>
+<tr><td>Migração</td><td>Que o objeto pode ser movido</td></tr>
+<tr><td>Replicação</td><td>Que o objeto tem cópias</td></tr>
+<tr><td>Concorrência</td><td>Que o objeto é compartilhado entre usuários independentes</td></tr>
+<tr><td>Falhas</td><td>Falhas e a recuperação do objeto</td></tr>
+</table></div>
+<p><b>Graus de transparência:</b> expor a distribuição às vezes é melhor. Exemplos: serviços baseados em localização, usuários em fusos diferentes e explicar por que algo está lento. Transparência total é um bom objetivo, mas difícil de alcançar.</p>
+
+<h3>3.3 Abertura</h3>
+<p>Um sistema aberto interage com outros sistemas abertos. Segundo o slide:</p>
+<ul>
+<li>Respeita interfaces bem definidas: atende.</li>
+<li>Permite portabilidade de aplicações: atende.</li>
+<li>É fácil de estender: atende.</li>
+<li>É facilmente interoperável: não atende.</li>
+</ul>
+
+<h3>3.4 Escalabilidade</h3>
+<p>O slide critica o uso vago de "escalável". Há três dimensões:</p>
+<div class="table-wrap"><table>
+<tr><th>Dimensão</th><th>Mede</th><th>Problema principal</th></tr>
+<tr><td>Tamanho</td><td>Nº de usuários/processos</td><td>Limites de CPU, disco e largura de banda</td></tr>
+<tr><td>Geográfica</td><td>Distância entre nós</td><td>LAN para WAN: mais latência, links pouco confiáveis, sem broadcast de rede</td></tr>
+<tr><td>Administrativa</td><td>Nº de domínios administrativos</td><td>Políticas conflitantes de uso, pagamento, gerenciamento e segurança (ex.: LGPD)</td></tr>
+</table></div>
+<p>A maioria dos sistemas escala só em tamanho, e até certo ponto. O desafio atual é a escala geográfica e a administrativa.</p>
+
+<h3>Sistema descentralizado</h3>
+<ul>
+<li>Nenhuma máquina tem a informação completa do estado do sistema.</li>
+<li>As máquinas decidem com base em informação local.</li>
+<li>A falha de uma máquina não deve arruinar o algoritmo.</li>
+<li>Não se pode assumir um relógio global.</li>
+</ul>
+
+<h3>Estimativa back-of-the-envelope (Twitter)</h3>
+<p>Serve para estimar vazão e armazenamento antes de projetar.</p>
+<p><b>Dados:</b> 400 milhões de usuários ativos, 50% usam por dia, 2 tweets por usuário/dia, 10% dos tweets com 1 MB de mídia, retenção de 5 anos.</p>
+<ul>
+<li>Usuários por dia: 400 mi × 0,5 = 200 mi</li>
+<li>TPS: (200 mi × 2) / (24 × 3600) ≈ 4.630 tweets/s</li>
+<li>Pico (2×): ≈ 9.260 tweets/s</li>
+<li>Mídia por dia: 200 mi × 2 × 0,1 × 1 MB ≈ 38 TB</li>
+<li>Mídia em 5 anos: ≈ 68 PB</li>
+</ul>
+<p>Pico de 2× basta? O caso do Ticketmaster (nov. 2022) mostra que não. A demanda foi cerca de 10× a esperada e o site caiu em uma hora.</p>
+
+<h3>Técnicas de escalabilidade</h3>
+<div class="table-wrap"><table>
+<tr><th>Técnica</th><th>Ideia</th><th>Exemplos</th></tr>
+<tr><td>Esconder latência</td><td>Não espere a resposta; faça outra coisa</td><td>Comunicação assíncrona, handlers multithread</td></tr>
+<tr><td>Particionamento</td><td>Divida dados e computação entre máquinas</td><td>DNS, WWW, microsserviços, sharding</td></tr>
+<tr><td>Replicação e cache</td><td>Faça cópias em várias máquinas</td><td>Sites espelhados, cache de navegador, memcached</td></tr>
+</table></div>
+<p>Limite da primeira técnica: nem toda aplicação funciona de forma assíncrona.</p>
+
+<h3>O problema da escalabilidade</h3>
+<ol>
+<li>Várias cópias geram inconsistência: alterar uma cópia a torna diferente das outras.</li>
+<li>Manter as cópias consistentes exige sincronização global a cada modificação.</li>
+<li>Não há relógio global, e a sincronização global impede soluções escaláveis.</li>
+</ol>
+<p>Saída: tolerar algum grau de inconsistência. Isso depende da aplicação.</p>
+
+<h2>4. Modelos de sistema</h2>
+<p class="note">Não confunda com comunicação síncrona e assíncrona entre cliente e servidor.</p>
+<div class="table-wrap"><table>
+<tr><th>Modelo</th><th>Limites de tempo (mensagem e ação)</th><th>Exemplo</th></tr>
+<tr><td>Síncrono</td><td>Conhecidos</td><td>LAN, datacenters</td></tr>
+<tr><td>Assíncrono</td><td>Nenhum</td><td>Internet</td></tr>
+<tr><td>Parcialmente síncrono</td><td>Começa assíncrono e eventualmente vira síncrono</td><td>Internet</td></tr>
+</table></div>
+
+<h2>5. Armadilhas</h2>
+<p>Muitos sistemas ficam complexos por causa de "consertos" feitos com hipóteses falsas:</p>
+<ol>
+<li>A rede é confiável.</li>
+<li>A rede é segura.</li>
+<li>A rede é homogênea.</li>
+<li>A topologia não muda.</li>
+<li>A latência é zero.</li>
+<li>A largura de banda é infinita.</li>
+<li>O custo de transporte é zero.</li>
+<li>A rede tem um administrador.</li>
+</ol>
+<p class="note">Observação: o slide usa "scale-in" para servidores mais poderosos. O termo usual é scale-up (escala vertical).</p>
+</section>
+
+<section id="p-exe" role="tabpanel" aria-labelledby="t-exe" hidden>
+<div class="bar">
+<span class="note">12 perguntas</span>
+<button class="btn" id="all" type="button">Mostrar todas as respostas</button>
+</div>
+<div id="list"></div>
+</section>
+</main>
+
+<script>
+var Q=[
+["Defina sistema distribuído e explique uma consequência de não haver relógio global.",
+ "<p>É uma coleção de elementos de computação autônomos (nós) que os usuários veem como um sistema único e coerente.</p><p>Sem relógio global, cada nó tem sua própria percepção de tempo. Isso causa problemas fundamentais de sincronização e coordenação, por exemplo para ordenar eventos entre nós.</p>"],
+["Qual a diferença entre overlay estruturada e não estruturada? Dê um exemplo de cada.",
+ "<p><b>Estruturada:</b> cada nó tem um conjunto bem definido de vizinhos, como em uma árvore ou um anel.</p><p><b>Não estruturada:</b> cada nó tem referências a nós escolhidos aleatoriamente, como em muitas redes P2P.</p><p>Em ambas, a overlay não precisa seguir a estrutura física da rede.</p>"],
+["Para que serve o middleware? Dê dois exemplos de funções que ele oferece.",
+ "<p>Ele fica entre os SOs locais e as aplicações. Reúne funções que cada aplicação não precisa reimplementar. Por isso é chamado de \"SO dos sistemas distribuídos\".</p><p>Exemplos: replicação, segurança, comunicação por broadcast.</p>"],
+["Explique a diferença entre transparência de relocalização e de migração.",
+ "<p><b>Migração:</b> esconde que um objeto pode ser movido para outra localidade.</p><p><b>Relocalização:</b> esconde que o objeto pode ser movido enquanto está sendo utilizado. O usuário não percebe o movimento durante o uso.</p>"],
+["Cite duas situações em que expor a distribuição é melhor do que escondê-la.",
+ "<p>Exemplos do slide:</p><ul><li>Serviços baseados em localização, como encontrar os amigos mais próximos.</li><li>Trabalhar com usuários em fusos horários diferentes.</li><li>Ajudar o usuário a entender o que acontece, como uma falha no servidor que causa conexão lenta.</li></ul>"],
+["Quais são as três dimensões de escalabilidade? Para cada uma, cite um problema típico.",
+ "<ul><li><b>Tamanho</b> (nº de usuários e processos): limites de CPU, armazenamento e largura de banda.</li><li><b>Geográfica</b> (distância entre nós): latência alta, links de WAN pouco confiáveis, sem broadcast da camada de rede.</li><li><b>Administrativa</b> (nº de domínios): políticas conflitantes de uso, pagamento e segurança, como a LGPD.</li></ul>"],
+["Um app tem 100 milhões de usuários ativos, 50% o usam por dia e cada um envia 3 posts por dia. Estime os posts por segundo na média e no pico de 2×.",
+ "<p>Usuários por dia: 100 mi × 0,5 = 50 mi.</p><p>Posts por dia: 50 mi × 3 = 150 mi.</p><p>Média: 150.000.000 / 86.400 ≈ <b>1.736 posts/s</b>.</p><p>Pico de 2×: ≈ <b>3.472 posts/s</b>.</p>"],
+["Por que usar um pico de 2× pode ser insuficiente? Cite um caso.",
+ "<p>Eventos raros podem gerar uma demanda bem maior que a prevista. No caso do Ticketmaster (nov. 2022), a demanda foi cerca de 10× a esperada. O site caiu em uma hora, com usuários deslogados ou presos em fila congelada.</p><p>A margem do pico deve vir da análise do caso de uso, não de um fator fixo.</p>"],
+["Descreva as três técnicas de escalabilidade e dê um exemplo de cada.",
+ "<ul><li><b>Esconder latência:</b> não esperar a resposta e fazer outra coisa. Exemplo: comunicação assíncrona.</li><li><b>Particionamento:</b> dividir dados e computação entre várias máquinas. Exemplos: DNS, sharding, microsserviços.</li><li><b>Replicação e cache:</b> manter cópias em várias máquinas. Exemplos: sites espelhados, cache de navegador, memcached.</li></ul>"],
+["Por que replicação e cache criam um problema difícil de escalabilidade?",
+ "<p>Várias cópias geram inconsistência: alterar uma cópia a torna diferente das outras.</p><p>Mantê-las consistentes exige sincronização global a cada modificação. Como não há relógio global, e a sincronização global impede soluções escaláveis, o sistema perde escala.</p><p>A saída é tolerar algum grau de inconsistência, o que depende da aplicação.</p>"],
+["Compare os modelos de sistema síncrono, assíncrono e parcialmente síncrono.",
+ "<ul><li><b>Síncrono:</b> os limites de tempo para transferir mensagens e processar ações são conhecidos. Exemplo: LAN ou datacenter.</li><li><b>Assíncrono:</b> não há limites de tempo. Exemplo: Internet.</li><li><b>Parcialmente síncrono:</b> começa assíncrono e eventualmente passa a se comportar como síncrono.</li></ul><p>Não confunda com comunicação síncrona e assíncrona entre cliente e servidor.</p>"],
+["Cite quatro falsas hipóteses sobre redes e explique por que uma delas causa problemas.",
+ "<p>Algumas das oito: a rede é confiável, é segura, é homogênea; a topologia não muda; a latência é zero; a largura de banda é infinita; o custo de transporte é zero; há um administrador.</p><p>Exemplo: assumir latência zero leva a projetos com muitas chamadas remotas em sequência. Em uma WAN, cada chamada soma atraso e o sistema fica lento. Depois vêm os \"consertos\", que aumentam a complexidade.</p>"]
+];
+var list=document.getElementById('list'),allBtn=document.getElementById('all');
+Q.forEach(function(q,i){
+  var d=document.createElement('div');d.className='q';
+  d.innerHTML='<p class="t">'+(i+1)+'. '+q[0]+'</p><button class="btn tg" type="button" aria-expanded="false">Mostrar resposta</button><div class="ans" hidden>'+q[1]+'</div>';
+  list.appendChild(d);
+});
+function setOne(d,show){
+  var a=d.querySelector('.ans'),b=d.querySelector('.tg');
+  a.hidden=!show;b.textContent=show?'Esconder resposta':'Mostrar resposta';b.setAttribute('aria-expanded',show);
+}
+function sync(){
+  var all=[].every.call(list.children,function(d){return !d.querySelector('.ans').hidden});
+  allBtn.textContent=all?'Esconder todas as respostas':'Mostrar todas as respostas';
+}
+list.addEventListener('click',function(e){
+  var b=e.target.closest('.tg');if(!b)return;
+  var d=b.parentNode;setOne(d,d.querySelector('.ans').hidden);sync();
+});
+allBtn.addEventListener('click',function(){
+  var show=allBtn.textContent.indexOf('Mostrar')===0;
+  [].forEach.call(list.children,function(d){setOne(d,show)});sync();
+});
+var tabs=[['t-res','p-res'],['t-exe','p-exe']];
+tabs.forEach(function(t){
+  document.getElementById(t[0]).addEventListener('click',function(){
+    tabs.forEach(function(u){
+      var on=u[0]===t[0];
+      document.getElementById(u[0]).setAttribute('aria-selected',on);
+      document.getElementById(u[1]).hidden=!on;
+    });
+    window.scrollTo(0,0);
+  });
+});
+</script>
+</body>
+</html>

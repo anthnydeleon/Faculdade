@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aula 09 (parte 1) – Nomes</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#fbfbfa;--fg:#1f2328;--muted:#656d76;--line:#e3e5e8;--accent:#1f5fbf;--soft:#eef3fb}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}}
+:root[data-theme="dark"]{--bg:#16181c;--fg:#e6e8eb;--muted:#9aa1a9;--line:#2b2f35;--accent:#7aa7ee;--soft:#1e2530}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:24px 18px 64px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:24px}
+nav button{font:inherit;background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+nav button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent);font-weight:600}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2{font-size:1.15rem;margin:32px 0 8px}
+h3{font-size:1rem;margin:20px 0 6px}
+p,ul,ol{margin:8px 0}
+ul,ol{padding-left:22px}
+blockquote{margin:12px 0;padding:8px 14px;background:var(--soft);border-left:3px solid var(--accent)}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted)}
+.note{color:var(--muted);font-size:.93rem}
+[hidden]{display:none!important}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;background:none;border:1px solid var(--line);color:var(--fg);padding:6px 12px;border-radius:6px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.q{padding:18px 0;border-bottom:1px solid var(--line)}
+.q p.t{margin:0 0 10px;font-weight:600}
+.ans{margin-top:12px;padding:10px 14px;background:var(--soft);border-radius:6px}
+.ans p{margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Nomes</h1>
+<p class="sub">Aula 09 (parte 1) · Sistemas Distribuídos · UFABC</p>
+
+<nav role="tablist">
+<button role="tab" id="t-res" aria-selected="true" aria-controls="p-res">Resumo</button>
+<button role="tab" id="t-exe" aria-selected="false" aria-controls="p-exe">Exercícios</button>
+</nav>
+
+<section id="p-res" role="tabpanel" aria-labelledby="t-res">
+<h2>1. Definições</h2>
+<p>Nomes denotam <b>entidades</b>. Para operar sobre uma entidade, é preciso um <b>ponto de acesso</b>, que é identificado por um <b>endereço</b>.</p>
+<ul><li><b>Nome puro (plano):</b> sem significado próprio, só uma string aleatória. Serve apenas para comparação.</li><li><b>Identificador:</b> um nome com três propriedades: (1) refere-se a no máximo uma entidade; (2) cada entidade tem no máximo um identificador; (3) sempre se refere à mesma entidade, sem reutilização.</li><li>Um identificador não precisa ser um nome puro. Pode ter conteúdo.</li></ul>
+
+<h2>2. Espaço de nomes plano</h2>
+<p>Problema: dado um nome não estruturado, como achar seu ponto de acesso? Os slides listam quatro abordagens: (1) soluções simples (broadcast, flooding, ponteiros), (2) baseadas em local pré-determinado (home-based), (3) DHT e (4) serviço hierárquico.</p>
+<h3>Broadcasting</h3>
+<p>Envia o ID a todos e pede que a entidade devolva o endereço. Não escala além de redes locais e obriga todos os processos a ouvir e processar os pedidos. Exemplo: <b>ARP</b>, que pergunta "quem tem este IP?" para achar o endereço MAC.</p>
+<h3>Flooding</h3>
+<p>O nó X envia a requisição R por um recurso A a alguns vizinhos V. Cada V:</p>
+<ol><li>ignora se já viu a requisição;</li><li>procura A localmente;</li><li>se não tem A, encaminha R a vizinhos;</li><li>se tem A, responde direto a X ou a quem encaminhou.</li></ol>
+<p>Tem problema de escalabilidade de tamanho e geográfica. O <b>TTL</b> limita o alcance: só encaminha se TTL &gt; 0, e passa TTL-1 adiante.</p>
+<p><b>Gnutella:</b> P2P de compartilhamento de arquivos. Busca por flooding com TTL: encaminha a 7 vizinhos com TTL=10. A resposta volta pelo caminho inverso. As transferências são diretas entre nós, via HTTP.</p>
+
+<h3>DHT Chord (visão rápida)</h3>
+<p>Nós em um anel lógico com IDs aleatórios de m bits. Cada entidade tem uma chave de m bits e fica sob o nó de menor id &ge; k (seu sucessor). Busca linear pelo anel é ruim, então cada nó p mantém uma <b>finger table</b> com até m entradas: <code>FT_p[i] = succ(p + 2^(i-1))</code>, ou seja, atalhos a distâncias 1, 2, 4, 8... Para a chave k, p encaminha ao nó FT_p[j] tal que FT_p[j] &le; k &lt; FT_p[j+1]. Veja a aula 09 (Chord) para os detalhes.</p>
+
+<h3>Serviço hierárquico de localização (HLS)</h3>
+<p>Árvore em larga escala: a rede é dividida em domínios hierárquicos, e cada domínio tem um nó de diretório. O endereço de uma entidade E fica em uma folha ou em um nó intermediário.</p>
+<ul><li><b>Invariantes:</b> um nó intermediário tem ponteiro para um filho se e somente se a subárvore desse filho contém o endereço de E. A raiz conhece todas as entidades.</li><li><b>Consulta:</b> começa na folha local. Se o nó conhece E, desce pelo ponteiro. Se não, sobe, até chegar à raiz se necessário.</li><li><b>Inserção:</b> o pedido sobe até o primeiro nó que conhece E. Cria-se uma cadeia de ponteiros até a folha, que guarda o endereço.</li></ul>
+
+<h2>3. DNS</h2>
+<p>Resolução de nomes é o mecanismo que recupera a entidade que tem o nome. O desafio é distribuir a resolução e o gerenciamento do espaço de nomes por várias máquinas, com escalabilidade e disponibilidade. O DNS (RFC de 1983, implementado em 1984) traduz um nome em IP.</p>
+<h3>Três níveis</h3>
+<div class="table-wrap"><table><tr><th>Item</th><th>Global</th><th>Administração</th><th>Gerencial</th></tr><tr><td>Escala geográfica</td><td>Mundial</td><td>Organização</td><td>Departamento</td></tr><tr><td>Nº de nós</td><td>Poucos</td><td>Muitos</td><td>Quantidades enormes</td></tr><tr><td>Responsividade</td><td>Segundos</td><td>Milissegundos</td><td>Imediato</td></tr><tr><td>Propagação de atualizações</td><td>Lenta</td><td>Imediata</td><td>Imediata</td></tr><tr><td>Nº de réplicas</td><td>Muitos</td><td>Nenhum ou poucos</td><td>Nenhum</td></tr><tr><td>Cache no cliente</td><td>Sim</td><td>Sim</td><td>Às vezes</td></tr></table></div>
+<p>O nível global tem os diretórios de topo (com, edu, org, jp...), gerenciados em conjunto e muito estáveis. O de administração agrupa diretórios de nível intermediário, sob administradores diferentes. O gerencial tem nós de um único administrador, com mudanças regulares.</p>
+<h3>Resolução iterativa e recursiva</h3>
+<div class="table-wrap"><table><tr><th></th><th>Iterativa</th><th>Recursiva</th></tr><tr><td>Quem percorre os servidores</td><td>O cliente. Cada servidor devolve o endereço do próximo.</td><td>Cada servidor repassa ao próximo e espera o resultado.</td></tr><tr><td>Exemplo <nl,vu,cs,ftp></td><td>O cliente pergunta ao root, depois ao servidor nl, depois ao vu, e assim por diante.</td><td>O cliente pergunta só ao root, que encadeia as consultas e devolve a resposta final.</td></tr></table></div>
+<p>Na resolução recursiva com cache, os servidores guardam resultados intermediários (por exemplo, #&lt;vu&gt; e #&lt;vu,cs&gt;). Isso acelera, mas o uso extensivo de cache pode gerar inconsistências.</p>
+<h3>Escalabilidade</h3>
+<ul><li><b>Tamanho:</b> servidores de alto nível recebem muitas requisições. Como os nós global e de administração mudam pouco, usa-se replicação extensiva e inicia-se a resolução no servidor mais próximo.</li><li><b>Geográfica:</b> a resolução recursiva reduz comunicação de longa distância em comparação à iterativa. Mapear nós a servidores em qualquer lugar cria uma dependência de localização implícita.</li></ul>
+<h3>Registros de um nó DNS</h3>
+<div class="table-wrap"><table><tr><th>Tipo</th><th>Descrição</th></tr><tr><td>SOA</td><td>Informações sobre a zona</td></tr><tr><td>A</td><td>Endereço IP do host que o nó representa</td></tr><tr><td>MX</td><td>Servidor de e-mail do nó</td></tr><tr><td>SRV</td><td>Servidor de um serviço específico</td></tr><tr><td>NS</td><td>Servidor de nomes da zona</td></tr><tr><td>CNAME</td><td>Link simbólico (alias)</td></tr><tr><td>PTR</td><td>Nome canônico de um host</td></tr><tr><td>HINFO</td><td>Informações sobre o host</td></tr><tr><td>TXT</td><td>Qualquer informação útil</td></tr></table></div>
+<p>O slide mostra um <code>dig ufabc.edu.br</code> com registros SOA, NS, A, MX e TXT, além de endereços A e AAAA dos servidores de nomes.</p>
+</section>
+
+<section id="p-exe" role="tabpanel" aria-labelledby="t-exe" hidden>
+<div class="bar">
+<span class="note">12 perguntas</span>
+<button class="btn" id="all" type="button">Mostrar todas as respostas</button>
+</div>
+<div id="list"></div>
+</section>
+</main>
+
+<script>
+var Q=[["Qual a diferença entre nome, identificador e endereço?", "<p>Nomes denotam entidades. O endereço identifica um ponto de acesso, necessário para operar sobre a entidade. O identificador é um nome com três propriedades: refere-se a no máximo uma entidade, cada entidade tem no máximo um identificador e nunca é reutilizado.</p>"], ["O que é um nome puro e para que ele serve?", "<p>É um nome sem significado próprio, só uma string aleatória. Serve apenas para comparação.</p>"], ["Por que o broadcast não resolve a localização de entidades em larga escala? Dê um exemplo de uso real.", "<p>Não escala além de redes locais, e todos os processos precisam ouvir e tratar os pedidos. Exemplo real: o ARP, que faz o broadcast de \"quem tem este IP?\" para achar o endereço MAC.</p>"], ["Descreva o que cada nó V faz ao receber uma requisição em flooding.", "<p>Se já viu a requisição, ignora. Procura o recurso localmente. Se não o tem, encaminha a vizinhos. Se o tem, responde direto a quem originou ou a quem encaminhou.</p>"], ["Qual o papel do TTL no flooding? Como o Gnutella o usava?", "<p>O TTL limita quantos saltos a requisição percorre: só é encaminhada se TTL &gt; 0, e o valor cai 1 a cada salto. No Gnutella, cada nó sem o arquivo encaminhava a 7 vizinhos com TTL=10. A resposta voltava pelo caminho inverso, e a transferência era direta via HTTP.</p>"], ["Quais são as invariantes do serviço hierárquico de localização (HLS)?", "<p>O endereço de E fica em uma folha ou nó intermediário. Um nó intermediário tem ponteiro para um filho se e somente se a subárvore desse filho tem o endereço de E. A raiz conhece todas as entidades.</p>"], ["Como funciona uma consulta no HLS?", "<p>Começa no nó folha local. Se o nó conhece E, segue o ponteiro para baixo. Se não, sobe ao pai e repete, até chegar à raiz, que sempre conhece E.</p>"], ["Quais são os três níveis do DNS e como diferem em estabilidade e número de nós?", "<p>Global: poucos nós, muito estáveis, atualizações lentas. Administração: muitos nós, mais mutáveis que o global. Gerencial: quantidades enormes de nós, de um único administrador, com mudanças regulares.</p>"], ["Compare resolução iterativa e recursiva no DNS.", "<p>Na iterativa, o cliente pergunta a cada servidor, que devolve o endereço do próximo. Na recursiva, o cliente pergunta ao primeiro servidor, que consulta os seguintes e devolve o resultado final. A recursiva permite cache nos servidores intermediários e reduz a comunicação de longa distância do cliente.</p>"], ["Qual o benefício e o risco do uso extensivo de cache na resolução de nomes?", "<p>Benefício: respostas mais rápidas e menos carga nos servidores de alto nível. Risco: inconsistências, pois o dado em cache pode ficar desatualizado.</p>"], ["Como o DNS lida com a escalabilidade de tamanho nos níveis global e de administração?", "<p>Como os conteúdos desses nós mudam pouco, usa-se replicação extensiva: nós mapeados a vários servidores, e a resolução começa no servidor mais próximo.</p>"], ["Para que servem os registros A, MX, NS e CNAME?", "<p>A: IP do host. MX: servidor de e-mail do nó. NS: servidor de nomes da zona. CNAME: link simbólico (alias) para outro nome.</p>"]];
+var list=document.getElementById('list'),allBtn=document.getElementById('all');
+Q.forEach(function(q,i){
+  var d=document.createElement('div');d.className='q';
+  d.innerHTML='<p class="t">'+(i+1)+'. '+q[0]+'</p><button class="btn tg" type="button" aria-expanded="false">Mostrar resposta</button><div class="ans" hidden>'+q[1]+'</div>';
+  list.appendChild(d);
+});
+function setOne(d,show){
+  var a=d.querySelector('.ans'),b=d.querySelector('.tg');
+  a.hidden=!show;b.textContent=show?'Esconder resposta':'Mostrar resposta';b.setAttribute('aria-expanded',show);
+}
+function sync(){
+  var all=[].every.call(list.children,function(d){return !d.querySelector('.ans').hidden});
+  allBtn.textContent=all?'Esconder todas as respostas':'Mostrar todas as respostas';
+}
+list.addEventListener('click',function(e){
+  var b=e.target.closest('.tg');if(!b)return;
+  var d=b.parentNode;setOne(d,d.querySelector('.ans').hidden);sync();
+});
+allBtn.addEventListener('click',function(){
+  var show=allBtn.textContent.indexOf('Mostrar')===0;
+  [].forEach.call(list.children,function(d){setOne(d,show)});sync();
+});
+var tabs=[['t-res','p-res'],['t-exe','p-exe']];
+tabs.forEach(function(t){
+  document.getElementById(t[0]).addEventListener('click',function(){
+    tabs.forEach(function(u){
+      var on=u[0]===t[0];
+      document.getElementById(u[0]).setAttribute('aria-selected',on);
+      document.getElementById(u[1]).hidden=!on;
+    });
+    window.scrollTo(0,0);
+  });
+});
+</script>
+</body>
+</html>

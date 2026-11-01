@@ -1,0 +1,659 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Prova 1 · Sistemas Distribuídos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: guia de estudo com abas fixas no topo; coluna de leitura ~70ch; anel Chord como motivo visual */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#18202b; --muted:#5b6575; --line:#d9dee6;
+  --accent:#1f5fbf; --accent-soft:#e3ecfa; --hot:#c4451c; --hot-soft:#fbe9e2; --ok:#1d7a4f; --ok-soft:#e1f2e9;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10141b; --surface:#171d27; --ink:#e6eaf0; --muted:#9aa5b5; --line:#2a3342;
+  --accent:#7aa8f0; --accent-soft:#1c2a42; --hot:#f08a63; --hot-soft:#3a2219; --ok:#5ec795; --ok-soft:#173226; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10141b; --surface:#171d27; --ink:#e6eaf0; --muted:#9aa5b5; --line:#2a3342;
+  --accent:#7aa8f0; --accent-soft:#1c2a42; --hot:#f08a63; --hot-soft:#3a2219; --ok:#5ec795; --ok-soft:#173226; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:0 64px}
+header.top{padding-block:28px 12px}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:700 clamp(28px,5vw,40px)/1.1 var(--display);margin:6px 0 10px;text-wrap:balance}
+h2{font:700 24px/1.2 var(--display);margin:32px 0 10px;text-wrap:balance}
+h3{font:600 17px/1.3 var(--body);margin:22px 0 6px}
+p,li{max-width:70ch}
+code,.mono{font-family:var(--mono);font-size:.92em}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:4px;overflow-x:auto;padding-block:8px}
+nav.tabs button{font:500 14px var(--body);color:var(--muted);background:none;border:1px solid transparent;border-radius:999px;padding:6px 14px;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--accent);background:var(--accent-soft);border-color:var(--accent)}
+nav.tabs button:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-block:8px 4px}
+.chip{font:500 12.5px var(--mono);padding:3px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.chip.hot{background:var(--hot-soft);color:var(--hot);border-color:transparent}
+.chip.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-block:12px}
+.box.warn{border-color:var(--hot);background:var(--hot-soft)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.grid2>*{min-width:0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tscroll{overflow-x:auto;margin-block:10px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+td{font-variant-numeric:tabular-nums}
+details{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-block:10px}
+details>summary{cursor:pointer;padding:12px 16px;font:600 16px var(--body);list-style:none;display:flex;justify-content:space-between;gap:12px}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"+";font:500 18px var(--mono);color:var(--muted)}
+details[open]>summary::after{content:"−"}
+details>.inner{padding:0 18px 14px;border-top:1px solid var(--line)}
+pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--mono);margin-block:10px}
+.k{color:var(--accent);font-weight:500}
+.c{color:var(--muted)}
+.tag{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:2px}
+.tag.p1{background:var(--accent-soft);color:var(--accent)}
+.tag.p2{background:var(--line);color:var(--muted)}
+.ans{border-left:3px solid var(--ok);padding-left:14px;margin-block:8px}
+.panel[hidden]{display:none}
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.days .box{margin:0}
+.days h3{margin-top:0}
+.days ul{padding-left:18px;margin:6px 0 0}
+/* Chord */
+.ctrl{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.ctrl label{display:flex;flex-direction:column;gap:4px;font:500 12px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ctrl input{font:14px var(--mono);padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.ctrl input#nodes{width:min(100%,420px)}
+.ctrl input.n{width:80px}
+.btn{font:600 14px var(--body);padding:8px 14px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--surface);cursor:pointer}
+.btn.ghost{background:none;color:var(--accent)}
+.ringwrap{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:18px;align-items:start;margin-top:14px}
+@media (max-width:680px){.ringwrap{grid-template-columns:1fr}}
+svg.ring{width:100%;max-width:340px;height:auto;display:block}
+.ftables{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.ft{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:12.5px var(--mono)}
+.ft b{font:600 13px var(--body);display:block;margin-bottom:4px}
+.ft td,.ft th{padding:2px 4px;border:0;font-size:12px}
+.ft .sel{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.err{color:var(--hot);font:13px var(--mono)}
+/* Quiz */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px;min-height:200px;display:flex;flex-direction:column;gap:12px}
+.card .q{font:600 18px/1.4 var(--body)}
+.card .a{border-top:1px dashed var(--line);padding-top:12px}
+.qbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:12px}
+.score{font:13px var(--mono);color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .2s}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">MCTA025-13 · UFABC · Q3 2026 · Prof. Vladimir Rocha</div>
+  <h1>Prova 1 de Sistemas Distribuídos</h1>
+  <div class="meta">
+    <span class="chip hot">Quinta, 15/10 · presencial</span>
+    <span class="chip">30% da nota</span>
+    <span class="chip">média harmônica: zero em qualquer prova zera a média</span>
+    <span class="chip">caneta azul/preta · calculadora simples</span>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Seções">
+  <button role="tab" data-tab="plano" aria-selected="true">O que cai</button>
+  <button role="tab" data-tab="resumo" aria-selected="false">Resumo</button>
+  <button role="tab" data-tab="exercicios" aria-selected="false">Exercícios resolvidos</button>
+  <button role="tab" data-tab="chord" aria-selected="false">Treino Chord</button>
+  <button role="tab" data-tab="quiz" aria-selected="false">Flashcards</button>
+</nav>
+
+<!-- ============ PLANO ============ -->
+<section class="panel" id="plano">
+<h2>O que deve cair</h2>
+<p>As aulas disponíveis vão até Nomeação + Chord. Pelo plano de ensino, a P1 cobre o que foi dado até lá; a P2 cobre a disciplina inteira. Por isso marquei cada questão das listas como <span class="tag p1">P1</span> (no escopo) ou <span class="tag p2">P2</span> (assunto ainda não dado: relógios, exclusão mútua, consistência, falhas, blockchain).</p>
+
+<div class="tscroll"><table>
+<thead><tr><th>Aula</th><th>Tema</th><th>Peso provável</th></tr></thead>
+<tbody>
+<tr><td>02–03</td><td>Introdução, transparências, escalabilidade, back-of-the-envelope, tipos de SD (cluster/grade/nuvem, ACID, pervasivos)</td><td>Alto (conceitos + 1 conta)</td></tr>
+<tr><td>04</td><td>Arquiteturas: estilos, cliente-servidor, 3 camadas, P2P, híbridas, BitTorrent, wrapper/broker</td><td>Alto (comparações)</td></tr>
+<tr><td>05</td><td>Processos e threads, dispatcher/worker, stateless × stateful, load balancer, migração de código</td><td>Médio</td></tr>
+<tr><td>06</td><td>Comunicação: tipos, RPC, MOM/Kafka, multicast FIFO/causal/total, gossip</td><td>Alto (algoritmo + ordens)</td></tr>
+<tr><td>09</td><td>Nomeação: flooding, DHT, HLS, DNS iterativo × recursivo</td><td>Alto</td></tr>
+<tr><td>09</td><td>Chord: fingertable, busca, algoritmo assíncrono, consistent hashing</td><td><b>Muito alto</b> (conta certa na prova)</td></tr>
+</tbody></table></div>
+
+<div class="box warn">
+<b>O professor avisa na Lista 2:</b> “algoritmo não é descrição em português”. Ao escrever algoritmo, use laços, condicionais, separe métodos locais de mensagens RPC, indente, e faça todas as mensagens <b>assíncronas e orientadas a eventos</b> (um método que envia, outro que recebe e reage). Veja o modelo na aba Exercícios.
+</div>
+
+<h2>Plano para os três dias</h2>
+<div class="days">
+  <div class="box"><h3>Segunda à noite</h3><ul>
+    <li>Ler o Resumo de Introdução, Tipos e Arquiteturas</li>
+    <li>Responder Lista 2: Q7, Q8 (sem olhar), depois conferir</li>
+    <li>Refazer a conta do Twitter e o exercício extra de back-of-the-envelope</li></ul></div>
+  <div class="box"><h3>Terça</h3><ul>
+    <li>Resumo de Processos e Comunicação</li>
+    <li>Lista 2: Q9; treinar os exemplos de multicast FIFO/causal/total</li>
+    <li>Escrever à mão o pseudocódigo de gossip e de RPC assíncrono</li></ul></div>
+  <div class="box"><h3>Quarta</h3><ul>
+    <li>Nomeação + Chord: fazer Q5 da Lista 2 à mão, conferir na aba Treino Chord</li>
+    <li>Gerar 3 anéis aleatórios no treino e montar fingertables na mão</li>
+    <li>Lista 2: Q6 e Q10; passar todos os flashcards</li></ul></div>
+</div>
+</section>
+
+<!-- ============ RESUMO ============ -->
+<section class="panel" id="resumo" hidden>
+<h2>Resumo por aula</h2>
+<p>Só o que está nos slides, organizado do jeito que costuma ser cobrado. O livro (Van Steen &amp; Tanenbaum, 4ª ed.) aprofunda cada item.</p>
+
+<details open><summary>Introdução (aula 02)</summary><div class="inner">
+<h3>Definição</h3>
+<p>Coleção de <b>elementos de computação autônomos</b> (nós) que os usuários veem como um <b>sistema único e coerente</b>. Consequência direta da autonomia: <b>não há relógio global</b>, o que causa os problemas de sincronização e coordenação.</p>
+<h3>Overlay e middleware</h3>
+<ul>
+<li><b>Rede overlay</b>: cada nó conversa só com seus vizinhos lógicos, independente da rede física. <b>Estruturada</b>: vizinhos bem definidos (anel, árvore). <b>Não estruturada</b>: vizinhos aleatórios.</li>
+<li><b>Middleware</b>: o “SO do sistema distribuído”, camada entre aplicações e SOs locais com funções que nenhuma aplicação precisa reimplementar (replicação, segurança, comunicação, broadcast).</li>
+</ul>
+<h3>Quatro objetivos</h3>
+<p>1. Compartilhar recursos · 2. Transparência de distribuição · 3. Abertura · 4. Escalabilidade.</p>
+<div class="tscroll"><table>
+<thead><tr><th>Transparência</th><th>Esconde…</th></tr></thead><tbody>
+<tr><td>Acesso</td><td>diferenças de representação de dados e de forma de invocação</td></tr>
+<tr><td>Localização</td><td>onde o objeto está</td></tr>
+<tr><td>Relocalização</td><td>que o objeto pode ser movido <i>enquanto está em uso</i></td></tr>
+<tr><td>Migração</td><td>que o objeto pode ser movido para outro lugar</td></tr>
+<tr><td>Replicação</td><td>que o objeto é replicado</td></tr>
+<tr><td>Concorrência</td><td>que o objeto é compartilhado por usuários independentes</td></tr>
+<tr><td>Falhas</td><td>a falha e a recuperação de um objeto</td></tr>
+</tbody></table></div>
+<p>Transparência total nem sempre é desejável: serviços baseados em localização, fusos horários diferentes, ou mostrar ao usuário que o servidor caiu.</p>
+<p><b>Abertura</b>: interfaces bem definidas, portabilidade, fácil de estender, interoperável.</p>
+<h3>Escalabilidade</h3>
+<ul>
+<li>Três dimensões (Neuman 1994): <b>tamanho</b> (nº de usuários/processos), <b>geográfica</b> (distância: latência, WAN pouco confiável, sem broadcast), <b>administrativa</b> (domínios com políticas conflitantes, ex. LGPD).</li>
+<li>A maioria escala só em tamanho, com máquinas mais potentes (scale-up/“scale-in”). Scale-out = adicionar máquinas.</li>
+<li>Técnicas: (1) <b>esconder latência</b> com comunicação assíncrona e handlers multithread; (2) <b>particionar</b> dados e computação (DNS, WWW, sharding, microsserviços, mover código ao cliente); (3) <b>replicar/cachear</b>.</li>
+<li>O problema: réplicas geram <b>inconsistência</b>; manter consistência exige sincronização global, que não escala. Tolerar inconsistência depende da aplicação.</li>
+<li>Sistema descentralizado: ninguém tem o estado completo, decisões só com informação local, falha de uma máquina não derruba o algoritmo, sem relógio global.</li>
+</ul>
+<h3>Modelos de sistema (não confundir com comunicação síncrona/assíncrona)</h3>
+<ul>
+<li><b>Síncrono</b>: limites de tempo de transmissão e processamento conhecidos (LAN, datacenter).</li>
+<li><b>Assíncrono</b>: sem limites (Internet).</li>
+<li><b>Parcialmente síncrono</b>: começa assíncrono, eventualmente se comporta como síncrono.</li>
+</ul>
+<h3>As 8 falácias</h3>
+<p>Rede confiável · segura · homogênea · topologia não muda · latência zero · banda infinita · custo de transporte zero · existe um administrador.</p>
+<h3>Back-of-the-envelope (tem calculadora na prova)</h3>
+<pre>Twitter: 400 mi usuários, 50% ativos/dia, 2 tweets/dia, 10% com 1 MB, 5 anos
+Ativos/dia  = 400 mi × 0,5          = 200 mi
+TPS         = 200 mi × 2 / 86.400   ≈ 4.629,63
+Pico (2×)   ≈ 9.259,26
+Mídia/dia   = 200 mi × 2 × 0,1 × 1 MB = 40 mi MB ≈ 38,147 TB  <span class="c">(÷1024²)</span>
+5 anos      = 38,147 × 365 × 5      ≈ 67,98 PB   <span class="c">(÷1024)</span></pre>
+</div></details>
+
+<details><summary>Tipos de sistemas distribuídos (aula 03)</summary><div class="inner">
+<div class="tscroll"><table>
+<thead><tr><th></th><th>Cluster</th><th>Grade</th><th>Nuvem</th></tr></thead><tbody>
+<tr><td>Hardware</td><td>Homogêneo, mesmo SO</td><td>Heterogêneo</td><td>Virtualizado</td></tr>
+<tr><td>Rede</td><td>LAN de alta velocidade</td><td>WAN, várias organizações</td><td>Datacenters</td></tr>
+<tr><td>Controle</td><td>Um nó mestre</td><td>Organizações virtuais (grupos com autorização)</td><td>Camadas de serviço</td></tr>
+</tbody></table></div>
+<p><b>Nuvem, 4 camadas</b>: Hardware → Infraestrutura (VMs, storage em bloco) → Plataforma (ex. S3) → Aplicação. <b>IaaS</b> cobre hardware+infraestrutura, <b>PaaS</b> a plataforma, <b>SaaS</b> a aplicação.</p>
+<h3>Sistemas de informação</h3>
+<ul>
+<li>Palavras-chave: <b>transação</b> e <b>integração</b>.</li>
+<li><b>ACID</b>: Atomicidade (tudo ou nada), Consistência (transição válida; estados intermediários inválidos são permitidos), Isolamento (como se fossem em série), Durabilidade (sobrevive a falhas).</li>
+<li>Transações aninhadas: subtransações em bancos independentes (companhia aérea + hotel). <b>TP Monitor</b> coordena a transação distribuída.</li>
+<li><b>EAI</b>: integração direta entre aplicações via <b>RPC</b> (Java RMI, gRPC) ou <b>MOM</b>. <b>Proxy</b>: componente que encaminha requisições ao servidor responsável.</li>
+</ul>
+<h3>Pervasivos (IoT)</h3>
+<ul>
+<li><b>Ubíquo</b>: sempre presente; mudança de contexto, autonomia, inteligência emergente (flocking).</li>
+<li><b>Móvel</b>: sem fio, localização muda (descoberta), redes tolerantes a disrupção. Pessoas voltam ao mesmo lugar em 24/48/72 h.</li>
+<li><b>Sensores</b>: muitos, simples, com bateria. Dados ao operador (a) ou processamento nos sensores, que respondem só à consulta (b).</li>
+</ul>
+</div></details>
+
+<details><summary>Arquiteturas (aula 04)</summary><div class="inner">
+<h3>Estilos arquiteturais</h3>
+<ol>
+<li><b>Camadas</b>: requisição desce, resposta sobe. Usado em cliente-servidor.</li>
+<li><b>Objetos</b>: objetos chamam métodos uns dos outros (RMI, microsserviços). Encapsulamento.</li>
+<li><b>Eventos e dados</b>: <b>publish/subscribe</b> desacopla na <b>referência</b> (processos anônimos); <b>espaço de dados compartilhado</b> (Linda) desacopla na <b>referência e no tempo</b> (não precisam estar ativos juntos).</li>
+<li><b>Recursos (REST)</b>: nomeação única (URI), mesma interface para todos, servidor esquece quem chamou (stateless). Nos slides: PUT cria, GET lê, DELETE apaga, POST modifica. Exemplo: S3 (<code>http://Bucket.s3.amazonaws.com/Objeto</code>).</li>
+</ol>
+<h3>Centralizadas</h3>
+<p>Cliente-servidor: requisição/resposta, cliente espera. Um processo pode ser cliente e servidor ao mesmo tempo. <b>3 camadas lógicas</b>: apresentação, negócio, dados. Camadas <b>físicas</b>: 1 (mainframe/terminal burro), 2 (cliente + servidor, configurações a–e conforme quanto fica no cliente), 3 (cada camada numa máquina).</p>
+<h3>Descentralizadas (P2P)</h3>
+<ul>
+<li>Peer é cliente e servidor ao mesmo tempo. Quase sempre é uma overlay.</li>
+<li><b>Estruturado</b>: nós seguem uma estrutura de dados distribuída (anel, árvore, DHT). Operação <code>LOOKUP(key)</code>. Ex.: Chord, Dynamo.</li>
+<li><b>Não estruturado</b>: grafo aleatório; cada nó tem visão parcial de <i>c</i> vizinhos e troca vizinhos via gossip. Busca por <b>flooding</b> ou <b>random walk</b>. Ex.: Gnutella.</li>
+<li><b>Superpeers</b>: alguns nós com papel especial (índice, monitoramento, conexões). Ex.: Skype antigo.</li>
+</ul>
+<h3>Híbridas</h3>
+<ul>
+<li><b>Edge servers / CDN</b>: cliente-servidor com servidores de borda perto do usuário.</li>
+<li><b>BitTorrent</b> (C-S + P2P): página Web → arquivo .torrent → <b>tracker</b> devolve lista de nós com o arquivo → o nó entra no <b>swarm</b> e troca pedaços em paralelo.</li>
+</ul>
+<h3>Arquitetura × middleware</h3>
+<ul>
+<li><b>Interceptor</b>: intercepta o fluxo normal ao invocar objeto remoto (nível de requisição ou de mensagem) para adaptar o comportamento, ex. replicar a chamada.</li>
+<li><b>Wrapper</b> (adaptador): interface que torna o componente acessível às outras aplicações; ligar N aplicações par a par precisa de até N(N−1) wrappers. <b>Broker</b>: componente central que faz as conversões; cada aplicação precisa de um só adaptador (2N no total).</li>
+</ul>
+</div></details>
+
+<details><summary>Processos e threads (aula 05)</summary><div class="inner">
+<ul>
+<li><b>Processo</b>: memória isolada (segurança). <b>Thread</b>: várias linhas de execução no mesmo processo, compartilhando memória.</li>
+<li>Troca de contexto entre threads é barata (IP + registradores); entre processos é cara (tabela de páginas, etc.). Processos ainda podem ser preferíveis para isolamento (Chrome).</li>
+<li>Memória compartilhada → <b>condição de corrida</b> (<code>id++</code> não é atômico). Solução: lock, semáforo, monitor, evitando deadlock.</li>
+<li>Por que threads em SD: evitar bloqueio em E/S, explorar paralelismo, evitar troca de contexto entre processos.</li>
+<li><b>Cliente multithread</b>: navegador baixa cada recurso numa thread; várias RPCs simultâneas a servidores diferentes dão speed-up quase linear.</li>
+<li><b>Servidor dispatcher/worker</b>: um despachante recebe e entrega a uma thread operária. A estrutura compartilhada entre workers tem condição de corrida.</li>
+<li>Servidor <b>iterativo</b> (uma requisição por vez) × <b>concorrente</b> (dispatcher). Concorrente é o mais comum.</li>
+</ul>
+<h3>Stateless × stateful</h3>
+<div class="grid2">
+<div class="box"><b>Stateless</b><br>Não guarda estado do cliente: não lembra arquivo aberto, não promete invalidar cache, não rastreia clientes. Cliente e servidor independentes, menos inconsistência após falhas. Perde desempenho (sem prefetching).</div>
+<div class="box"><b>Stateful</b><br>Guarda estado: arquivos abertos (prefetching), sabe quem tem cache e permite cópias locais. Desempenho muito alto; o problema passa a ser inconsistência e recuperação após falha.</div>
+</div>
+<h3>Clusters de servidores</h3>
+<p>3 camadas: switch lógico/<b>load balancer</b> (round-robin, ociosidade, sessão) → servidores de aplicação → arquivos/BD distribuídos. Frontend sobrecarrega: <b>switch de transporte</b> só redireciona; <b>distribuição por conteúdo</b> escolhe o backend pelo conteúdo e faz <i>TCP handoff</i>.</p>
+<h3>Migração de código</h3>
+<div class="tscroll"><table><thead><tr><th>Modelo</th><th>O que se move</th></tr></thead><tbody>
+<tr><td>CS (cliente-servidor)</td><td>Nada; código e recurso no servidor</td></tr>
+<tr><td>REV (avaliação remota)</td><td>Cliente envia o código para executar no servidor</td></tr>
+<tr><td>CoD (código sob demanda)</td><td>Cliente baixa o código do servidor (JavaScript, modelos de ML)</td></tr>
+<tr><td>MA (agentes móveis)</td><td>Código + estado de execução migram entre máquinas</td></tr>
+</tbody></table></div>
+<p>Motivos: distribuir carga, ficar perto dos dados, flexibilidade. Em sistemas heterogêneos: linguagens interpretadas (VM própria), VM de SO (VirtualBox), container (Docker).</p>
+</div></details>
+
+<details><summary>Comunicação (aula 06)</summary><div class="inner">
+<h3>Tipos</h3>
+<ul>
+<li>TCP: orientado a conexão, confiável, fluxo. UDP: datagrama, best-effort.</li>
+<li><b>Transiente</b>: descarta se não entregar. <b>Persistente</b>: armazena até entregar.</li>
+<li><b>Síncrona</b>: três pontos onde o cliente pode bloquear: no <b>envio</b>, na <b>entrega</b> ao servidor, ou <b>após o processamento</b>.</li>
+</ul>
+<h3>RPC: os 10 passos</h3>
+<pre>1 cliente chama o stub          6 servidor executa e devolve ao stub
+2 stub empacota (marshaling)    7 stub empacota o resultado
+3 SO envia ao SO remoto         8 SO envia ao SO do cliente
+4 SO remoto entrega ao stub     9 SO do cliente entrega ao stub
+5 stub desempacota e chama      10 stub desempacota e retorna</pre>
+<ul>
+<li>Concorrência: em geral (Java RMI) dispatcher/worker, uma thread por requisição → proteger variáveis compartilhadas.</li>
+<li><b>RPC assíncrono</b>: servidor só confirma o recebimento; cliente segue. <b>Síncrono diferido</b>: cliente segue e o servidor chama o cliente de volta com outra RPC de mão única (ou o cliente faz <i>poll</i>). <b>Multicast RPC</b>: mesma chamada a vários servidores.</li>
+<li><b>Java RMI</b>: interface <code>extends Remote</code> (métodos lançam <code>RemoteException</code>); implementação <code>extends UnicastRemoteObject</code>; servidor faz <code>createRegistry</code> + <code>bind</code>; cliente faz <code>getRegistry</code> + <code>lookup</code>.</li>
+<li><b>gRPC</b> (Google, 2015): IDL com Protocol Buffers, mensagens bem menores e mais rápidas que REST/JSON.</li>
+</ul>
+<h3>MOM (filas)</h3>
+<p>Comunicação <b>assíncrona e persistente</b>. Primitivas: <b>PUT</b> (adiciona), <b>GET</b> (bloqueia até ter mensagem e remove), <b>POLL</b> (verifica, nunca bloqueia), <b>NOTIFY</b> (instala tratador). <b>Message broker</b> converte formatos e gerencia filas.</p>
+<p><b>Kafka</b>: tópico = log append-only; consumidor lê pelo <b>offset</b>; broker é stateless; <b>partições</b> (sharding) escolhidas pelo produtor via hash da chave; <b>replicação</b> com um líder (lê/escreve) e N seguidores (só para falhas). <b>ActiveMQ</b>: <i>queue</i> (ponto a ponto, um consumidor recebe) × <i>topic</i> (todos os assinantes recebem).</p>
+<h3>Multicast: ordens de entrega</h3>
+<ul>
+<li><b>FIFO</b>: se <i>o mesmo processo</i> envia m1 e depois m2, todos entregam m1 antes de m2. Mensagens de remetentes diferentes podem chegar em qualquer ordem.</li>
+<li><b>Causal</b>: se m1 precede causalmente m2 (ex.: P2 recebeu m1 e então enviou m2), todos entregam m1 antes. Não depende do remetente.</li>
+<li><b>Total</b>: todos entregam todas as mensagens <i>na mesma ordem</i>, qualquer que seja.</li>
+<li>Receber ≠ entregar: receber vem da rede; entregar é a decisão do middleware de repassar à aplicação.</li>
+</ul>
+<h3>Gossip / protocolos epidêmicos</h3>
+<ul>
+<li><b>Anti-entropy</b>: cada nó escolhe periodicamente outro aleatório e troca estado. <b>Pull</b> (só pede), <b>push</b> (só envia), <b>push-pull</b> (ambos): O(log N) rodadas.</li>
+<li><b>Rumor</b>: nó atualizado espalha; se o contatado já sabia, para com probabilidade p<sub>stop</sub>. Fração que nunca recebe: <code>s = e^{−(1/p<sub>stop</sub>+1)(1−s)}</code>. Com 1/p<sub>stop</sub>=1, ≈20% (2032 de 10.000) ficam sem a atualização: rumor sozinho não garante todos.</li>
+<li>Remover dados em gossip é difícil: a remoção apaga a informação e uma réplica antiga “ressuscita” o dado. Solução: <b>certificados de óbito</b> (registro da remoção).</li>
+</ul>
+</div></details>
+
+<details><summary>Nomeação (aula 09)</summary><div class="inner">
+<ul>
+<li><b>Nome</b> denota entidade; <b>ponto de acesso</b> é identificado por um <b>endereço</b>.</li>
+<li><b>Identificador</b>: (1) refere-se a no máximo uma entidade; (2) cada entidade tem no máximo um identificador; (3) sempre a mesma entidade, sem reutilização. Telefone celular <i>não</i> é bom identificador: números são reaproveitados e uma pessoa pode ter vários.</li>
+</ul>
+<h3>Localizar nomes planos</h3>
+<ol>
+<li><b>Broadcast</b> (ARP): todos escutam; não escala além da LAN.</li>
+<li><b>Flooding</b> com <b>TTL</b>: envia aos vizinhos, ignora repetidas, decrementa TTL. Gnutella: 7 vizinhos, TTL=10, resposta volta pelo caminho inverso, download direto via HTTP. Problema de escalabilidade de tamanho e geográfica.</li>
+<li><b>DHT</b> (Chord): O(log N).</li>
+<li><b>HLS</b>: árvore de domínios; a raiz conhece todas as entidades. <i>Consulta</i>: começa na folha local, sobe até achar registro e desce pelos ponteiros. <i>Inserção</i>: sobe até o primeiro nó que conhece E e cria cadeia de ponteiros até a folha.</li>
+</ol>
+<h3>DNS</h3>
+<div class="tscroll"><table><thead><tr><th>Item</th><th>Global</th><th>Administração</th><th>Gerencial</th></tr></thead><tbody>
+<tr><td>Escala geográfica</td><td>Mundial</td><td>Organização</td><td>Departamento</td></tr>
+<tr><td>Nº de nós</td><td>Poucos</td><td>Muitos</td><td>Enorme</td></tr>
+<tr><td>Responsividade</td><td>Segundos</td><td>Milissegundos</td><td>Imediata</td></tr>
+<tr><td>Propagação de atualização</td><td>Lenta</td><td>Imediata</td><td>Imediata</td></tr>
+<tr><td>Nº de réplicas</td><td>Muitas</td><td>Nenhuma ou poucas</td><td>Nenhuma</td></tr>
+<tr><td>Cache no cliente</td><td>Sim</td><td>Sim</td><td>Às vezes</td></tr>
+</tbody></table></div>
+<div class="grid2">
+<div class="box"><b>Iterativa</b><br>Cliente pergunta à raiz, recebe o endereço do próximo servidor e pergunta a ele, e assim por diante. Cliente faz todo o trabalho; muitas mensagens de longa distância partindo do cliente.</div>
+<div class="box"><b>Recursiva</b><br>Cada servidor repassa ao próximo e devolve o resultado. Mais carga nos servidores, mas <b>cache</b> muito eficaz (cada servidor guarda resultados intermediários) e menos comunicação de longa distância do cliente.</div>
+</div>
+<p>Registros: SOA, A, MX, SRV, NS, CNAME, PTR, HINFO, TXT. Escalabilidade de tamanho: replicar os níveis altos (mudam pouco).</p>
+</div></details>
+
+<details><summary>DHT Chord (aula 09)</summary><div class="inner">
+<ul>
+<li>Espaço de identificadores {0 … 2<sup>m</sup>−1} em anel módulo 2<sup>m</sup>. Nós e chaves recebem id pela mesma hash H.</li>
+<li><code>succ(k)</code> = primeiro nó com id ≥ k no sentido horário. A chave k fica no nó <code>succ(k)</code>; cada nó n é responsável por <code>(pred, n]</code>.</li>
+<li>Invariante: todo nó conhece seu sucessor. Só com sucessor, a busca é O(N).</li>
+<li><b>Fingertable</b>: <code>FT<sub>p</sub>[i] = succ(p + 2<sup>i−1</sup>)</code>, i = 1..m (distâncias 1, 2, 4, 8…). Busca em O(log N) saltos (log₂ 10⁶ ≈ 20).</li>
+<li>Roteamento: encaminhar ao maior finger que fica em <code>(n, k)</code> (closestPrecedingNode). Se <code>k ∈ (n, sucessor]</code>, o sucessor é o responsável.</li>
+<li><b>Consistent hashing</b>: entrar ou sair um nó move só O(K/N) chaves. Com <code>H(key) % N</code>, mudar N remapeia quase todas as chaves.</li>
+<li>Elimina o SPOF de uma tabela hash num servidor só e dá particionamento (sharding).</li>
+</ul>
+</div></details>
+</section>
+
+<!-- ============ EXERCÍCIOS ============ -->
+<section class="panel" id="exercicios" hidden>
+<h2>Exercícios resolvidos</h2>
+<p>Tente responder antes de abrir cada um. As respostas seguem o que está nos slides.</p>
+
+<details><summary>Lista 2 · Q5 · Chord: nó 49 busca 15 <span class="tag p1">P1</span></summary><div class="inner">
+<p>Nós: 0, 5, 7, 12, 17, 21, 26, 35, 37, 40, 42, 46, 49, 53, 56, 58, 63. Máximo 64 ids → m = 6. Responsável por 15 = succ(15) = <b>17</b>.</p>
+<div class="tscroll"><table>
+<thead><tr><th>i</th><th>2<sup>i−1</sup></th><th>FT 49</th><th>FT 5</th><th>FT 12</th></tr></thead><tbody>
+<tr><td>1</td><td>1</td><td>succ(50)=53</td><td>succ(6)=7</td><td>succ(13)=17</td></tr>
+<tr><td>2</td><td>2</td><td>succ(51)=53</td><td>succ(7)=7</td><td>succ(14)=17</td></tr>
+<tr><td>3</td><td>4</td><td>succ(53)=53</td><td>succ(9)=12</td><td>succ(16)=17</td></tr>
+<tr><td>4</td><td>8</td><td>succ(57)=58</td><td>succ(13)=17</td><td>succ(20)=21</td></tr>
+<tr><td>5</td><td>16</td><td>succ(65 mod 64=1)=<b>5</b></td><td>succ(21)=21</td><td>succ(28)=35</td></tr>
+<tr><td>6</td><td>32</td><td>succ(81 mod 64=17)=17</td><td>succ(37)=37</td><td>succ(44)=46</td></tr>
+</tbody></table></div>
+<div class="ans">
+<p><b>A.</b> No 49: 15 não está em (49, 53]. Maior finger dentro de (49, 15): FT[6]=17 não serve (17 passa de 15); FT[5]=<b>5</b> serve. Vai para 5.<br>
+No 5: 15 ∉ (5, 7]. Maior finger em (5, 15): 37, 21, 17 passam; FT[3]=<b>12</b> serve. Vai para 12.<br>
+No 12: 15 ∈ (12, 17] → o responsável é <b>17</b>. Caminho: 49 → 5 → 12 → 17.</p>
+<p><b>B.</b> Busca linear: 49→53→56→58→63→0→5→7→12→17 = 9 saltos. Chord: 3 saltos. Economia de <b>6 saltos</b>.</p>
+</div>
+<p>Confira outros casos na aba Treino Chord, que já abre com este anel.</p>
+</div></details>
+
+<details><summary>Lista 2 · Q5C · Algoritmo assíncrono da busca no Chord <span class="tag p1">P1</span></summary><div class="inner">
+<pre><span class="c">// Estrutura do nó (atributos)</span>
+No {
+  int meuId; No predecessor; No sucessor
+  No[] FT            <span class="c">// FT[i] = succ(meuId + 2^(i-1)), i = 1..M</span>
+  KV  tabela         <span class="c">// pares chave-valor que este nó guarda</span>
+}
+
+<span class="c">// RPC assíncrona: alguém pergunta quem é o responsável por id</span>
+<span class="k">procedure</span> n.findSuccessor(id, No ini)
+  <span class="k">if</span> id ∈ (n, sucessor] <span class="k">then</span>
+     ini.response(id, sucessor)           <span class="c">// RPC ao iniciador</span>
+  <span class="k">else</span>
+     m = closestPrecedingNode(id)         <span class="c">// método LOCAL</span>
+     m.findSuccessor(id, ini)             <span class="c">// RPC assíncrona, não espera</span>
+
+<span class="c">// método local</span>
+<span class="k">procedure</span> n.closestPrecedingNode(id)
+  <span class="k">for</span> i = M <span class="k">downto</span> 1
+     <span class="k">if</span> FT[i] ∈ (n, id) <span class="k">then return</span> FT[i]
+  <span class="k">return</span> sucessor
+
+<span class="c">// evento: chega a resposta no iniciador</span>
+<span class="k">procedure</span> n.response(id, No resp)
+  <span class="k">if</span> op == put <span class="k">then</span> resp.store(id, valor)    <span class="c">// RPC</span>
+  <span class="k">else if</span> op == get <span class="k">then</span> resp.retrieve(id, n) <span class="c">// RPC; valor chega em outro evento</span>
+
+<span class="k">procedure</span> n.get(chave)
+  op = get; id = H(chave)
+  findSuccessor(id, n)</pre>
+<p>Nos slides o <code>closestPrecedingNode</code> retorna <code>n</code> se nenhum finger servir; retornar o sucessor evita mandar a mensagem para si mesmo. Qualquer um dos dois é aceitável se você explicar.</p>
+</div></details>
+
+<details><summary>Lista 2 · Q6 · Módulo, SHA1, MD5 como mapeamento chave-valor <span class="tag p1">P1</span></summary><div class="inner"><div class="ans">
+<p><b>Módulo</b>: <code>nó = H(chave) % N</code>. Simples e distribui bem, mas quando N muda (nó entra ou sai) quase todas as chaves mudam de nó e precisam ser transferidas. Útil com conjunto fixo de servidores ou partições fixas (ex. partições de tópico no Kafka).</p>
+<p><b>SHA-1</b>: hash criptográfica de 160 bits. Usada no Chord para gerar ids de nós (ex. hash do IP:porta) e de chaves no mesmo espaço; a saída uniforme espalha bem as chaves pelo anel e, com consistent hashing, só O(K/N) chaves migram.</p>
+<p><b>MD5</b>: hash de 128 bits, mesma ideia (espaço de ids de 128 bits, por isso “normalmente M = 128”). Mais rápida, mas quebrada para segurança; serve para distribuição de chaves, não para integridade contra ataque.</p>
+</div></div></details>
+
+<details><summary>Lista 2 · Q7 · Três camadas, híbrida, cliente-servidor, P2P <span class="tag p1">P1</span></summary><div class="inner"><div class="tscroll"><table>
+<thead><tr><th>Arquitetura</th><th>Vantagens</th><th>Desvantagens</th></tr></thead><tbody>
+<tr><td>Cliente/servidor</td><td>Simples, controle e segurança centralizados, consistência fácil</td><td>Servidor é gargalo e SPOF; escala só verticalmente até certo ponto</td></tr>
+<tr><td>Três camadas</td><td>Separa apresentação, negócio e dados; cada camada escala e evolui separadamente (load balancer no meio)</td><td>Mais latência (mais saltos), mais máquinas para administrar</td></tr>
+<tr><td>Peer-to-peer</td><td>Sem SPOF, recursos crescem com o nº de peers, escala em tamanho</td><td>Difícil de buscar (flooding) ou manter a estrutura (churn); segurança e consistência difíceis</td></tr>
+<tr><td>Híbrida</td><td>Combina: servidor para descoberta/índice (tracker, CDN) e P2P ou borda para o tráfego pesado</td><td>Componente central volta a ser ponto de falha; mais complexa</td></tr>
+</tbody></table></div></div></details>
+
+<details><summary>Lista 2 · Q8 · Interoperável, portável, robusta, escalável <span class="tag p1">P1</span></summary><div class="inner"><div class="ans">
+<p><b>Interoperável</b>: componentes de fabricantes ou implementações diferentes trabalham juntos seguindo apenas um padrão/interface comum.</p>
+<p><b>Portável</b>: uma aplicação feita para um sistema roda, sem mudanças, em outro sistema que implementa as mesmas interfaces.</p>
+<p><b>Robusta</b>: continua funcionando corretamente diante de falhas e entradas inesperadas (transparência de falhas, tolerância a falhas).</p>
+<p><b>Escalável</b>: mantém desempenho aceitável ao crescer em tamanho, distância geográfica ou domínios administrativos. Diga sempre em qual das três dimensões.</p>
+</div></div></details>
+
+<details><summary>Lista 2 · Q9 · Stateless × stateful <span class="tag p1">P1</span></summary><div class="inner"><div class="ans">
+<p>O servidor <b>stateless</b> trata cada requisição de forma independente e não guarda nada do cliente: não registra arquivos abertos, não promete invalidar cache do cliente, não rastreia clientes. Responsabilidade do cliente enviar todo o contexto em cada requisição. Falhas afetam menos e qualquer réplica atende (fácil de balancear).</p>
+<p>O <b>stateful</b> guarda estado (sessão, arquivos abertos, quem tem cache). Responsável por manter e recuperar esse estado. Ganha desempenho (prefetching, cache no cliente); se cair, o estado se perde e precisa ser recuperado, e o balanceador precisa mandar o cliente ao mesmo servidor (sessão).</p>
+</div></div></details>
+
+<details><summary>Lista 2 · Q10 · BitTorrent <span class="tag p1">P1</span></summary><div class="inner"><div class="ans">
+<p><b>Seeder × leecher</b>: seeder tem o arquivo completo e só envia; leecher ainda está baixando e envia os pedaços que já tem.</p>
+<p><b>Tracker</b>: servidor que mantém a lista de peers do swarm de um arquivo; não guarda o arquivo.</p>
+<p><b>Servidor Web</b>: hospeda o arquivo <code>.torrent</code> (metadados: pedaços, hashes, endereço do tracker), ponto de entrada da busca.</p>
+<p><b>Tit-for-tat</b>: o peer envia preferencialmente a quem mais lhe envia (unchoke dos melhores), com um unchoke otimista aleatório para descobrir novos parceiros. Combate free-riders.</p>
+<p><b>Rarest-first</b>: baixar primeiro o pedaço mais raro entre os vizinhos, para que ele não suma se o único dono sair e para equilibrar a disponibilidade.</p>
+</div><p>BitTorrent tem aula própria no plano, depois de Chord. Se ainda não foi dada, pode ficar para a P2.</p></div></details>
+
+<details><summary>Extra · Back-of-the-envelope <span class="tag p1">P1</span></summary><div class="inner">
+<p>Uma rede social tem 80 milhões de usuários ativos por dia. Cada um publica 3 posts por dia; 20% dos posts têm foto de 2 MB. Guardar por 5 anos. Calcule o TPS, o pico (2×) e o armazenamento de mídia.</p>
+<div class="ans"><pre>TPS       = 80 mi × 3 / 86.400        ≈ 2.777,78
+Pico      ≈ 5.555,56
+Mídia/dia = 80 mi × 3 × 0,2 × 2 MB = 96 mi MB ÷ 1024² ≈ 91,55 TB
+5 anos    = 91,55 × 365 × 5 ≈ 167.083,74 TB ÷ 1024 ≈ 163,17 PB</pre>
+<p>Pergunta de reflexão do professor: “picos de 2× são suficientes?” O caso Ticketmaster (2022) teve 10×.</p></div>
+</div></details>
+
+<details><summary>Extra · Ordens de multicast <span class="tag p1">P1</span></summary><div class="inner">
+<p>P1 envia m1 e depois m2. P4 envia m3 e depois m4. Entregas: P2 = m1, m3, m2, m4; P3 = m3, m1, m2, m4. É FIFO? É total?</p>
+<div class="ans"><p><b>FIFO sim</b>: em ambos m1 vem antes de m2 e m3 antes de m4. <b>Total não</b>: P2 entrega m1 antes de m3 e P3 entrega m3 antes de m1.</p>
+<p>Causal: se P2 recebe m1 e só então envia m2, todo processo precisa entregar m1 antes de m2, mesmo m1 e m2 vindo de remetentes diferentes. Se P3 entregar m2 antes de m1, viola a ordem causal.</p></div>
+</div></details>
+
+<details><summary>Extra · Pseudocódigo de gossip (push-pull) <span class="tag p1">P1</span></summary><div class="inner"><pre><span class="k">procedure</span> n.run()                  <span class="c">// main do nó</span>
+  <span class="k">while</span> true
+     sleepMs(x)
+     executeGossip()
+
+<span class="k">procedure</span> n.executeGossip()        <span class="c">// local</span>
+  p = selectNode()                  <span class="c">// aleatório da visão parcial</span>
+  p.shareInfo(getLocalInfo(), n)    <span class="c">// RPC assíncrona (push)</span>
+
+<span class="k">procedure</span> n.shareInfo(info, q)     <span class="c">// evento: vários podem chamar ao mesmo tempo</span>
+  addInfo(info)                     <span class="c">// proteger com lock</span>
+  q.updateInfo(getLocalInfo())      <span class="c">// RPC de volta (pull)</span>
+
+<span class="k">procedure</span> n.updateInfo(info)        <span class="c">// evento</span>
+  addInfo(info)</pre></div></details>
+
+<details><summary>Lista 0 · nivelamento (Q5, Q9, Q10)</summary><div class="inner"><div class="ans">
+<p><b>Q5</b>: falha por hora p = 0,0001 → tempo médio até falhar (geométrica) = 1/p = 10.000 h. Com dois reservas usados em sequência: 3 × 10.000 = <b>30.000 h</b>.</p>
+<p><b>Q9</b>: 10 threads fazem <code>lbm = lbm + 1</code> sem lock. Normalmente imprime 10, mas a condição de corrida permite qualquer valor de <b>1 a 10</b>.</p>
+<p><b>Q10</b>: <code>i</code> é global, começa em 0. Pai e filho têm cópias separadas; cada um faz dois incrementos e imprime <b>2</b>. Saída: <code>2 2</code>.</p>
+</div></div></details>
+
+<h2>Questões que ficam para a P2</h2>
+<p>Lista 2: Q1 (relógios vetoriais), Q2 (Ricart &amp; Agrawala), Q3 (primary-based remote-write), Q4 (blockchain). Lista 1: capítulos Coordination, Consistency and Replication e Fault Tolerance. Os capítulos 1 a 4 e Naming da Lista 1 são da P1 e pedem trechos do livro; vale ler as seções correspondentes à noite.</p>
+</section>
+
+<!-- ============ CHORD ============ -->
+<section class="panel" id="chord" hidden>
+<h2>Treino Chord</h2>
+<p>Monte a fingertable na mão e depois confira aqui. O anel abre com o exercício da Lista 2.</p>
+<div class="box">
+<form class="ctrl" id="chordForm">
+  <label for="nodes">Nós (ids separados por vírgula)<input id="nodes" value="0,5,7,12,17,21,26,35,37,40,42,46,49,53,56,58,63"></label>
+  <label for="mbits">m<input id="mbits" class="n" type="number" min="2" max="8" value="6"></label>
+  <label for="start">Nó inicial<input id="start" class="n" type="number" value="49"></label>
+  <label for="key">Chave<input id="key" class="n" type="number" value="15"></label>
+  <button class="btn" type="submit">Buscar</button>
+  <button class="btn ghost" type="button" id="rand">Anel aleatório</button>
+  <button class="btn ghost" type="button" id="slide">Exemplo do slide</button>
+</form>
+<div id="chordErr" class="err"></div>
+</div>
+<div class="ringwrap">
+  <svg class="ring" id="ring" viewBox="0 0 340 340" role="img" aria-label="Anel Chord com o caminho da busca"></svg>
+  <div style="min-width:0">
+    <div id="pathOut"></div>
+  </div>
+</div>
+<h3>Fingertables dos nós no caminho</h3>
+<p class="c" style="color:var(--muted);margin-top:0">A linha destacada é o finger escolhido para encaminhar.</p>
+<div class="ftables" id="ftOut"></div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="panel" id="quiz" hidden>
+<h2>Flashcards</h2>
+<p>Responda de cabeça, depois revele e marque se acertou. Os que você errar voltam para o fim da pilha.</p>
+<div class="card" id="card">
+  <div class="eyebrow" id="qtopic"></div>
+  <div class="q" id="qtext"></div>
+  <div class="a" id="qans" hidden></div>
+</div>
+<div class="qbar">
+  <span class="score" id="qscore"></span>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn ghost" id="reveal">Mostrar resposta</button>
+    <button class="btn ghost" id="wrong" hidden>Errei</button>
+    <button class="btn" id="right" hidden>Acertei</button>
+    <button class="btn ghost" id="restart">Recomeçar</button>
+  </div>
+</div>
+</section>
+</div>
+
+<script>
+// ---------- tabs ----------
+const tabs=[...document.querySelectorAll('nav.tabs button')];
+function show(id){tabs.forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id));
+ document.querySelectorAll('.panel').forEach(p=>p.hidden=p.id!==id);
+ try{localStorage.setItem('sd-tab',id)}catch(e){}}
+tabs.forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+(function(){let h=location.hash.slice(1);let s=null;try{s=localStorage.getItem('sd-tab')}catch(e){}
+ const t=tabs.find(b=>b.dataset.tab===h)?h:(tabs.find(b=>b.dataset.tab===s)?s:'plano');show(t)})();
+
+// ---------- chord ----------
+const $=id=>document.getElementById(id);
+function chord(nodes,m,start,key){
+  const S=2**m; const N=[...new Set(nodes)].sort((a,b)=>a-b);
+  const succ=x=>{x=((x%S)+S)%S;for(const n of N)if(n>=x)return n;return N[0]};
+  const open=(x,a,b)=>a<b?(x>a&&x<b):(a===b?x!==a:(x>a||x<b));
+  const half=(x,a,b)=>a<b?(x>a&&x<=b):(a===b?true:(x>a||x<=b));
+  const ft=n=>Array.from({length:m},(_,i)=>({i:i+1,start:(n+2**i)%S,raw:n+2**i,node:succ(n+2**i)}));
+  const steps=[];let n=start,guard=0;
+  while(guard++<64){const t=ft(n),s=t[0].node;
+    const pi=N.indexOf(n),pred=N[(pi-1+N.length)%N.length];
+    if(n===key||(N.length>1&&half(key,pred,n))){steps.push({n,t,sel:null,resp:n,why:`${key} ∈ (${pred}, ${n}] → o próprio nó ${n} é o responsável`});break}
+    if(half(key,n,s)){steps.push({n,t,sel:0,resp:s,why:`${key} ∈ (${n}, ${s}] → responsável é ${s}`});break}
+    let sel=null;for(let i=m-1;i>=0;i--)if(open(t[i].node,n,key)){sel=i;break}
+    if(sel===null)sel=0;
+    steps.push({n,t,sel,why:`${key} ∉ (${n}, ${s}]; maior finger em (${n}, ${key}) é FT[${sel+1}] = ${t[sel].node}`});
+    n=t[sel].node}
+  const resp=steps[steps.length-1].resp;
+  const iS=N.indexOf(start),iR=N.indexOf(resp);const linear=(iR-iS+N.length)%N.length;
+  return {N,S,steps,resp,linear,succKey:succ(key)};
+}
+function drawRing(r,start,key){
+  const svg=$('ring'),C=170,R=128,S=r.S;const pt=(id,rad)=>{const a=2*Math.PI*id/S-Math.PI/2;return[C+rad*Math.cos(a),C+rad*Math.sin(a)]};
+  const path=r.steps.map(s=>s.n).concat(r.resp!==r.steps[r.steps.length-1].n?[r.resp]:[]);
+  let h=`<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="var(--line)" stroke-width="2"/>`;
+  h+=`<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--hot)"/></marker></defs>`;
+  const [kx,ky]=pt(key,R);h+=`<circle cx="${kx}" cy="${ky}" r="4" fill="none" stroke="var(--hot)" stroke-width="2" stroke-dasharray="2 2"/>`;
+  for(let i=0;i+1<path.length;i++){const[a,b]=[pt(path[i],R-6),pt(path[i+1],R-6)];
+    h+=`<path d="M${a[0]},${a[1]} Q${C},${C} ${b[0]},${b[1]}" fill="none" stroke="var(--hot)" stroke-width="2" marker-end="url(#ah)" opacity=".9"/>`}
+  for(const n of r.N){const[x,y]=pt(n,R),[lx,ly]=pt(n,R+18);const onp=path.includes(n);
+    const fill=n===r.resp?'var(--ok)':(onp?'var(--hot)':'var(--accent)');
+    h+=`<circle cx="${x}" cy="${y}" r="${onp?6:4.5}" fill="${fill}"/><text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="${onp?'var(--ink)':'var(--muted)'}" font-weight="${onp?600:400}">${n}</text>`}
+  h+=`<text x="${C}" y="${C-6}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--muted)">busca ${key}</text><text x="${C}" y="${C+12}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--muted)">2^${Math.log2(S)} = ${S} ids</text>`;
+  svg.innerHTML=h;
+}
+function runChord(){
+  $('chordErr').textContent='';
+  const m=parseInt($('mbits').value,10),S=2**m;
+  const nodes=$('nodes').value.split(/[,;\s]+/).filter(Boolean).map(Number);
+  const start=parseInt($('start').value,10),key=parseInt($('key').value,10);
+  if(!(m>=2&&m<=8))return $('chordErr').textContent='Use m entre 2 e 8.';
+  if(nodes.some(x=>!Number.isInteger(x)||x<0||x>=S))return $('chordErr').textContent=`Todos os ids precisam estar entre 0 e ${S-1}.`;
+  if(!nodes.includes(start))return $('chordErr').textContent='O nó inicial precisa ser um dos nós do anel.';
+  if(!(key>=0&&key<S))return $('chordErr').textContent=`A chave precisa estar entre 0 e ${S-1}.`;
+  const r=chord(nodes,m,start,key);drawRing(r,start,key);
+  const hops=r.steps.map(s=>s.n);if(r.resp!==hops[hops.length-1])hops.push(r.resp);
+  const ch=hops.length-1;
+  $('pathOut').innerHTML=`<div class="box" style="margin-top:0"><div class="eyebrow">Responsável por ${key}: succ(${key}) = ${r.succKey}</div>
+  <p style="font:600 18px var(--mono);margin:6px 0">${hops.join(' → ')}</p>
+  <ol style="padding-left:18px;margin:6px 0">${r.steps.map(s=>`<li>No nó ${s.n}: ${s.why}</li>`).join('')}</ol>
+  <p style="margin:6px 0 0">Chord: <b>${ch}</b> salto(s) · linear: <b>${r.linear}</b> · economia: <b>${r.linear-ch}</b></p></div>`;
+  $('ftOut').innerHTML=r.steps.map(s=>`<div class="ft"><b>Nó ${s.n}</b><table><thead><tr><th>i</th><th>n+2<sup>i−1</sup></th><th>succ</th></tr></thead><tbody>${s.t.map((f,j)=>`<tr class="${j===s.sel?'sel':''}"><td>${f.i}</td><td>${f.raw>=S?`${f.raw}%${S}=${f.start}`:f.start}</td><td>${f.node}</td></tr>`).join('')}</tbody></table></div>`).join('');
+}
+$('chordForm').addEventListener('submit',e=>{e.preventDefault();runChord()});
+$('rand').addEventListener('click',()=>{const m=6,S=64,set=new Set();while(set.size<10)set.add(Math.floor(Math.random()*S));
+  const N=[...set].sort((a,b)=>a-b);$('mbits').value=m;$('nodes').value=N.join(',');$('start').value=N[Math.floor(Math.random()*N.length)];$('key').value=Math.floor(Math.random()*S);runChord()});
+$('slide').addEventListener('click',()=>{$('mbits').value=5;$('nodes').value='1,4,9,11,14,18,20,21,28';$('start').value=1;$('key').value=26;runChord()});
+runChord();
+
+// ---------- flashcards ----------
+const CARDS=[
+["Introdução","Defina sistema distribuído e diga a consequência da autonomia dos nós.","Coleção de elementos de computação autônomos vista pelo usuário como um sistema único e coerente. Como cada nó é autônomo, não existe relógio global."],
+["Introdução","Quais os quatro objetivos de um SD?","Compartilhar recursos, transparência de distribuição, abertura e escalabilidade."],
+["Introdução","Diferença entre transparência de migração e de relocalização.","Migração: esconde que o objeto pode ser movido. Relocalização: esconde que ele é movido enquanto está em uso."],
+["Introdução","Quais as três dimensões de escalabilidade?","Tamanho (usuários/processos), geográfica (distância) e administrativa (domínios)."],
+["Introdução","Três técnicas de escalabilidade e o problema que elas trazem.","Esconder latência (assíncrono), particionar (sharding, DNS) e replicar/cachear. Réplicas geram inconsistência, e manter consistência exige sincronização global, que não escala."],
+["Introdução","Modelo síncrono × assíncrono × parcialmente síncrono.","Síncrono: limites de tempo de mensagem e processamento conhecidos (LAN). Assíncrono: sem limites (Internet). Parcialmente síncrono: assíncrono no início, eventualmente síncrono."],
+["Tipos","Cluster × grade.","Cluster: homogêneo, LAN, um nó mestre. Grade: heterogêneo, várias organizações, WAN, organizações virtuais."],
+["Tipos","O que significa cada letra de ACID?","Atomicidade (tudo ou nada), Consistência (transição válida), Isolamento (como se fossem serializadas), Durabilidade (efeito permanente)."],
+["Arquiteturas","Pub/sub × espaço de dados compartilhado: que desacoplamento cada um dá?","Pub/sub desacopla na referência. Espaço de dados compartilhado desacopla na referência e no tempo."],
+["Arquiteturas","Três propriedades do estilo baseado em recursos (REST).","Nomeação única (URI), mesma interface para todos os serviços, e o servidor esquece quem chamou (stateless)."],
+["Arquiteturas","P2P estruturado × não estruturado × superpeer.","Estruturado: nós seguem uma estrutura de dados (anel/DHT). Não estruturado: vizinhos aleatórios, busca por flooding/random walk. Superpeer: alguns nós com função especial (índice, conexões)."],
+["Arquiteturas","Wrapper × broker.","Wrapper adapta a interface de um componente; conectar todos com todos exige até N(N−1). Broker é central e faz as conversões; cada aplicação precisa de um adaptador só."],
+["Processos","Por que troca de contexto entre threads é mais barata que entre processos?","Thread só troca IP e registradores; processo troca tabela de páginas, tratadores de interrupção etc."],
+["Processos","Explique o modelo dispatcher/worker e o cuidado que exige.","Dispatcher recebe a requisição e repassa a uma thread worker. Workers compartilham estruturas, então há condição de corrida: usar lock."],
+["Processos","Stateless × stateful: vantagem de cada.","Stateless: independência, recuperação simples, fácil de balancear. Stateful: desempenho alto (prefetching, cache no cliente), com risco de inconsistência."],
+["Processos","CS, REV, CoD e MA.","CS: nada se move. REV: cliente envia código ao servidor. CoD: cliente baixa código do servidor. MA: código e estado migram."],
+["Comunicação","Os três pontos de sincronização da comunicação síncrona.","No envio da requisição, na entrega ao servidor e após o processamento."],
+["Comunicação","Transiente × persistente.","Transiente descarta a mensagem se não puder entregar. Persistente guarda até entregar (ex. MOM)."],
+["Comunicação","O que faz o stub do cliente numa RPC?","Recebe a chamada local, empacota (marshaling) nome do procedimento e parâmetros, pede ao SO para enviar e depois desempacota o resultado."],
+["Comunicação","RPC assíncrono × síncrono diferido.","Assíncrono: servidor só confirma o recebimento. Síncrono diferido: além disso, o servidor devolve o resultado com outra RPC de mão única ao cliente (ou cliente faz poll)."],
+["Comunicação","PUT, GET, POLL, NOTIFY em MOM.","PUT adiciona; GET bloqueia até ter e remove; POLL verifica sem bloquear; NOTIFY instala tratador."],
+["Comunicação","No Kafka, quem escolhe a partição e como?","O produtor, normalmente pelo hash de uma chave, porque o broker é stateless."],
+["Comunicação","FIFO × causal × total.","FIFO: mensagens do mesmo remetente na ordem de envio. Causal: se m1 causa m2, todos entregam m1 antes. Total: todos entregam todas na mesma ordem."],
+["Comunicação","Pull, push e push-pull no anti-entropy. Quantas rodadas o push-pull leva?","Pull pede atualizações, push envia, push-pull faz os dois. Push-pull leva O(log N) rodadas."],
+["Comunicação","Por que rumor sozinho não basta?","Uma fração s = e^{−(1/pstop+1)(1−s)} nunca recebe a atualização (≈20% com 1/pstop = 1)."],
+["Nomeação","Três propriedades de um identificador.","Refere-se a no máximo uma entidade, cada entidade tem no máximo um identificador, e ele nunca é reutilizado."],
+["Nomeação","Como funciona flooding com TTL no Gnutella?","Envia a 7 vizinhos com TTL=10, decrementa a cada salto, ignora requisições já vistas, responde pelo caminho inverso e baixa direto via HTTP."],
+["Nomeação","Resolução DNS iterativa × recursiva.","Iterativa: o cliente pergunta a cada servidor. Recursiva: cada servidor repassa ao próximo; mais carga no servidor, mas cache eficaz e menos comunicação de longa distância do cliente."],
+["Chord","Fórmula da fingertable.","FT_p[i] = succ(p + 2^(i−1)) mod 2^m, para i = 1..m."],
+["Chord","Por que não usar H(key) % N?","Ao entrar ou sair um nó, N muda e quase todas as chaves trocam de nó. Com consistent hashing só O(K/N) chaves migram."],
+["Chord","Qual nó guarda a chave k e qual intervalo cada nó cobre?","succ(k), o primeiro nó com id ≥ k. O nó n cobre (predecessor, n]."]
+];
+let deck=[],idx=0,right=0,done=0;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function restart(){deck=shuffle(CARDS.map((c,i)=>i));idx=0;right=0;done=0;render()}
+function render(){
+  const total=CARDS.length;
+  if(idx>=deck.length){$('qtopic').textContent='Fim';$('qtext').textContent=`Você acertou ${right} de ${total} na primeira tentativa.`;$('qans').hidden=true;
+    ['reveal','wrong','right'].forEach(i=>$(i).hidden=true);$('qscore').textContent='';return}
+  const c=CARDS[deck[idx]];$('qtopic').textContent=c[0];$('qtext').textContent=c[1];$('qans').textContent=c[2];$('qans').hidden=true;
+  $('reveal').hidden=false;$('wrong').hidden=true;$('right').hidden=true;
+  $('qscore').textContent=`Restam ${deck.length-idx} · acertos ${right}/${total}`;
+}
+$('reveal').addEventListener('click',()=>{$('qans').hidden=false;$('reveal').hidden=true;$('wrong').hidden=false;$('right').hidden=false});
+$('right').addEventListener('click',()=>{if(!deck.seen?.has(idx))right++;idx++;render()});
+$('wrong').addEventListener('click',()=>{deck.push(deck[idx]);deck.seen=deck.seen||new Set();deck.seen.add(deck.length-1);idx++;render()});
+$('restart').addEventListener('click',restart);
+restart();
+</script>
+
+</body></html>
