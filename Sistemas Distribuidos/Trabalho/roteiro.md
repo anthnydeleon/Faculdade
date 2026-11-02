@@ -16,7 +16,7 @@
 
 As seções IV a VIII são texto escrito, com números de linha, dentro do PDF. Narrar tudo aquilo consumiria os 5 minutos e deixaria de fora justamente o que é cobrado no vídeo.
 
-**O que este roteiro faz:** cumpre II e III por inteiro e aproveita os tempos mortos da demonstração para narrar, em alto nível, o conteúdo de IV, V, VI e VII — citando as linhas. Isso não substitui o relatório; só reforça.
+**O que este roteiro faz:** cumpre II e III por inteiro e aproveita os tempos mortos da demonstração para narrar, em alto nível, o conteúdo de IV, V, VI e VII. As falas não citam número de linha: isso fica no relatório, onde é obrigatório. Os números conferidos estão em [linhas-relatorio.md](linhas-relatorio.md).
 
 ### Dependência do Bloco 7
 
@@ -81,7 +81,7 @@ IP do lider: 127.0.0.1
 Porta do lider: 10097
 ```
 
-> "Subo o primeiro servidor. A inicialização está nas linhas 105 a 151 do Servidor ponto java: ele captura do teclado o IP e a porta dele e o IP e a porta do líder. Na linha 121 compara os dois pares, e como são iguais, este processo se reconhece como líder."
+> "Subo o primeiro servidor. Na inicialização ele captura do teclado o IP e a porta dele e o IP e a porta do líder. Como os dois pares são iguais, este processo se reconhece como líder."
 
 **Ação:** no **Console 2**:
 
@@ -113,7 +113,7 @@ IP do lider: 127.0.0.1
 Porta do lider: 10097
 ```
 
-> "E o terceiro. Cada servidor guarda quatro estruturas, declaradas no começo do arquivo: a tabela de valores na linha 39, que é o mapa de chave para valor; a tabela de timestamps na linha 49, que guarda a versão de cada chave; o contador de timestamp na linha 56, que só o líder usa como relógio lógico; e a lista de seguidores na linha 65, com o endereço de cada servidor registrado."
+> "E o terceiro. Cada servidor guarda quatro estruturas: a tabela de valores, que é o mapa de chave para valor; a tabela de timestamps, que guarda a versão de cada chave; o contador de timestamp, que só o líder usa como relógio lógico; e a lista de seguidores, com o endereço de cada servidor registrado."
 
 ---
 
@@ -137,7 +137,7 @@ IP do servidor 3: 127.0.0.1
 Porta do servidor 3: 10099
 ```
 
-> "Subo os dois clientes e faço o INIT em cada um, informando os três servidores. O INIT está nas linhas 116 a 151 do Cliente ponto java. O cliente guarda os endereços na lista da linha 39 e mantém, na linha 49, um mapa de chave para o último timestamp que ele já viu daquela chave. O cliente não sabe qual servidor é o líder: ele sorteia um a cada operação, na linha 325."
+> "Subo os dois clientes e faço o INIT em cada um, informando os três servidores. O cliente guarda esses endereços numa lista e mantém um mapa de chave para o último timestamp que ele já viu daquela chave. O cliente não sabe qual servidor é o líder: ele sorteia um a cada operação."
 
 ---
 
@@ -153,15 +153,15 @@ Digite o value: SD1
 
 Este PUT leva 25 segundos. Use o tempo para narrar as seções VI e VII:
 
-> "Vou gravar a chave `curso` com o valor `SD1`. O tratamento do PUT está nas linhas 283 a 367 do Servidor. O líder recebeu, gerou o timestamp e gravou."
+> "Vou gravar a chave `curso` com o valor `SD1`. O líder recebeu o pedido, gerou o timestamp e gravou nas tabelas dele."
 
-> "Sobre as threads do servidor: a thread principal só aceita conexões, no laço da linha 144, e para cada conexão cria uma thread da classe AtendeConexao, nas linhas 161 a 202. Além dela, o líder cria uma thread ReplicaEmSeguidor por seguidor, nas linhas 380 a 424, para avisar os dois em paralelo. É por isso que o 10098 já replicou."
+> "Sobre as threads do servidor: a thread principal só aceita conexões, e para cada conexão cria uma thread que atende aquele pedido do início ao fim. Além dela, o líder cria uma thread por seguidor para enviar a replicação, e assim os dois são avisados em paralelo. É por isso que o 10098 já replicou."
 
-> "Sobre a proteção de concorrência: todo acesso às tabelas acontece dentro de synchronized no objeto de trava da linha 76. No PUT, o bloco da linha 317 gera o timestamp e grava. Repare que ele não faz rede nenhuma por dentro: a lista de seguidores é copiada ali e usada só depois, com a trava liberada, senão um PUT travaria todos os outros."
+> "Sobre a proteção de concorrência: todo acesso às tabelas acontece dentro de um bloco synchronized, sempre no mesmo objeto de trava. No PUT, esse bloco gera o timestamp e grava. Repare que ele não faz rede nenhuma por dentro: a lista de seguidores é copiada ali e usada só depois, com a trava liberada, senão um PUT travaria todos os outros."
 
 Quando o `PUT_OK` aparecer:
 
-> "O líder esperou o REPLICATION_OK dos dois seguidores, no join da linha 347, e só então respondeu PUT_OK com o timestamp 1."
+> "O líder esperou o REPLICATION_OK dos dois seguidores e só então respondeu PUT_OK com o timestamp 1."
 
 ---
 
@@ -174,7 +174,7 @@ Escolha: 3
 Digite a key: curso
 ```
 
-> "Agora o primeiro caso que o enunciado pede: um GET normal. O cliente envia a chave e o último timestamp que tem dela, que é zero, porque este cliente nunca leu nada. O servidor sorteado tem timestamp 1, que é maior ou igual, então responde na hora com o valor e com o próprio timestamp. O tratamento está nas linhas 469 a 536 do Servidor."
+> "Agora o primeiro caso que o enunciado pede: um GET normal. O cliente envia a chave e o último timestamp que tem dela, que é zero, porque este cliente nunca leu nada. O servidor sorteado tem timestamp 1, que é maior ou igual, então responde na hora com o valor e com o próprio timestamp."
 
 Aponte com o mouse a linha no console do servidor que atendeu:
 
@@ -210,17 +210,17 @@ Escolha: 3
 Digite a key: curso
 ```
 
-> "Repito o GET até o sorteio cair no servidor atrasado... caiu no 10099. Ele compara: o timestamp dele é 1, o do cliente é 2. Ele está atrás do que o cliente já viu, então não pode devolver o valor antigo. Responde WAIT_FOR_RESPONSE e encerra a conexão. Essa decisão está na linha 495 do Servidor."
+> "Repito o GET até o sorteio cair no servidor atrasado... caiu no 10099. Ele compara: o timestamp dele é 1, o do cliente é 2. Ele está atrás do que o cliente já viu, então não pode devolver o valor antigo. Responde WAIT_FOR_RESPONSE e encerra a conexão."
 
-> "Repare que o menu do cliente voltou na mesma hora: ele não ficou bloqueado. Quem vai esperar é o servidor, numa thread da classe EsperaAtualizacao, nas linhas 550 a 603, que usa wait dentro de um while na linha 575."
+> "Repare que o menu do cliente voltou na mesma hora: ele não ficou bloqueado. Quem vai esperar é o servidor, numa thread criada só para isso, que fica em wait dentro de um while até a chave alcançar a versão que o cliente pediu."
 
 **Ação:** não digite nada. Espere o atraso terminar.
 
-> "O wait libera a trava enquanto dorme, então o servidor continua atendendo normalmente. Quando a replicação chegar, o notifyAll da linha 451 acorda essa thread..."
+> "O wait libera a trava enquanto dorme, então o servidor continua atendendo normalmente. Quando a replicação chegar, o notifyAll acorda essa thread..."
 
 Quando a linha tardia aparecer sozinha no Console 5, aponte com o mouse:
 
-> "Pronto. O valor `SD2`, vindo do 10099, chegou sozinho no cliente, sem eu digitar nada. Quem recebeu foi a thread EscutaRespostas do cliente, nas linhas 161 a 188, que fica em accept numa porta que o cliente abriu no INIT. O cliente nunca leu um valor mais antigo do que o que já tinha visto."
+> "Pronto. O valor `SD2`, vindo do 10099, chegou sozinho no cliente, sem eu digitar nada. Quem recebeu foi a thread de escuta do cliente, que fica esperando numa porta que ele abriu no INIT. O cliente nunca leu um valor mais antigo do que o que já tinha visto."
 
 ---
 
@@ -257,7 +257,7 @@ IP do lider: 127.0.0.1
 Porta do lider: 10097
 ```
 
-> "Subo o 10099 de novo. Ele volta completamente vazio. Na linha 141, por não ser o líder, ele dispara a thread RegistraNoLider, nas linhas 214 a 278: ela se apresenta ao líder, recebe as duas tabelas completas e mescla, aceitando só o que for mais novo. Por isso ele imprime 'Informações recebidas do líder'."
+> "Subo o 10099 de novo. Ele volta completamente vazio. Por não ser o líder, ele dispara uma thread que se apresenta ao líder, recebe as duas tabelas completas e mescla, aceitando só o que for mais novo. Por isso ele imprime 'Informações recebidas do líder'."
 
 **Ação:** no **Console 5**, repetir até a resposta vir do **10099**:
 
@@ -293,53 +293,6 @@ Digite a key: cidade
 
 ---
 
-# Linhas citadas na narração
-
-Confira estes números **antes de gravar**. Qualquer edição no código muda todos eles.
-
-### Servidor.java
-
-| Trecho | Linhas |
-|---|---|
-| Tabela de valores | 39 |
-| Tabela de timestamps | 49 |
-| Contador de timestamp | 56 |
-| Lista de seguidores | 65 |
-| Objeto de trava | 76 |
-| Inicialização pelo teclado | 105–151 |
-| Detecção de líder | 121 |
-| Laço `accept()` | 144 |
-| Thread `AtendeConexao` | 161–202 |
-| Thread `RegistraNoLider` | 214–278 |
-| Tratamento do PUT | 283–367 |
-| `synchronized` do PUT | 317 |
-| `join()` dos REPLICATION_OK | 347 |
-| Thread `ReplicaEmSeguidor` | 380–424 |
-| Tratamento do REPLICATION | 431–461 |
-| `notifyAll()` da replicação | 451 |
-| Tratamento do GET | 469–536 |
-| Decisão do WAIT_FOR_RESPONSE | 495 |
-| Thread `EsperaAtualizacao` | 550–603 |
-| `wait()` dentro do `while` | 575 |
-| Tratamento do SYNC_REQUEST | 621–639 |
-
-### Cliente.java
-
-| Trecho | Linhas |
-|---|---|
-| Lista de servidores | 39 |
-| Tabela de timestamps do cliente | 49 |
-| Objeto de trava | 57 |
-| Menu | 76–109 |
-| INIT | 116–151 |
-| Abertura da porta de escuta | 140–141 |
-| Thread `EscutaRespostas` | 161–188 |
-| PUT | 195–234 |
-| GET | 241–289 |
-| Impressão da resposta do GET | 300–318 |
-| Sorteio do servidor | 325 |
-
----
 
 # Riscos e como reagir ao vivo
 
@@ -364,6 +317,6 @@ Se você mesmo assim não quiser reinserir o atraso, o vídeo fica sem o `WAIT_F
 
 Nesse caso, remova o Bloco 7 inteiro, a duração cai para cerca de 3 min 25 s, e no Bloco 9 acrescente esta frase, para que ao menos fique claro que o caso está implementado:
 
-> "O caso do WAIT_FOR_RESPONSE está implementado nas linhas 495 a 516 do Servidor, com a thread de espera nas linhas 550 a 603, mas ele não aparece sob demanda neste vídeo: como o líder só confirma o PUT depois do REPLICATION_OK de todos os seguidores, nenhum servidor no ar chega a ficar atrás do cliente."
+> "O caso do WAIT_FOR_RESPONSE está implementado no tratamento do GET, com uma thread de espera dedicada, mas ele não aparece sob demanda neste vídeo: como o líder só confirma o PUT depois do REPLICATION_OK de todos os seguidores, nenhum servidor no ar chega a ficar atrás do cliente."
 
 Isso é honesto e pode render a consideração do professor, mas **não substitui a demonstração** e provavelmente não evita o desconto. Minha recomendação continua sendo gravar o Bloco 7 com o atraso temporário.
