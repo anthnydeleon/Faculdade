@@ -12,67 +12,29 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 
-/*
- * =====================================================================
- * Cliente.java
- *
- * Usuario do KV Store. Faz PUT e GET em um dos tres servidores, escolhido
- * ao acaso a cada operacao, sem conhecer qual deles e o lider.
- *
- * O cliente mantem, para cada chave, o maior timestamp que ja recebeu, e
- * envia esse valor em toda leitura. E esse controle que impede o sistema
- * de lhe devolver uma versao anterior a que ele ja leu.
- * =====================================================================
- */
+// O cliente faz PUT e GET em um servidor sorteado a cada operacao.
+// Guarda o ultimo timestamp visto de cada chave e envia esse valor no GET.
 public class Cliente {
 
-    // =================================================================
-    // ESTRUTURAS DE DADOS DO CLIENTE
-    // =================================================================
-
-    /*
-     * LISTA DE SERVIDORES.
-     * Para que serve: guarda onde ficam os tres servidores, para o cliente
-     * poder sortear um a cada operacao.
-     * O que armazena: tres enderecos no formato "ip:porta".
-     */
+    // enderecos "ip:porta" dos tres servidores
     private static ArrayList<String> servidores = new ArrayList<String>();
 
-    /*
-     * TABELA DE TIMESTAMPS DO CLIENTE.
-     * Para que serve: registrar a versao mais nova que este cliente ja leu
-     * de cada chave, valor que acompanha toda requisicao GET e garante a
-     * leitura monotonica.
-     * O que armazena: chave -> ultimo timestamp visto. Comeca vazia, e uma
-     * chave que nunca foi vista vale 0.
-     */
+    // chave -> ultimo timestamp que este cliente ja viu
     private static HashMap<String, Long> meusTimestamps = new HashMap<String, Long>();
 
-    /*
-     * OBJETO DE TRAVA (lock).
-     * Para que serve: a tabela de timestamps e usada por duas threads (a do
-     * menu e a que recebe respostas tardias), entao todo acesso a ela
-     * acontece dentro de synchronized (trava).
-     */
+    // trava da tabela de timestamps, que e usada pela thread do menu e pela
+    // thread que recebe as respostas atrasadas
     private static final Object trava = new Object();
 
-    /** Sorteador usado para escolher um servidor aleatorio a cada operacao. */
     private static Random sorteio = new Random();
-
-    /** Conversor objeto <-> JSON. */
     private static Gson gson = new Gson();
 
-    /** Porta em que este cliente escuta respostas tardias do GET. */
+    // porta onde o cliente recebe a resposta atrasada do GET
     private static int minhaPorta;
 
-    /** Indica se o INIT ja foi feito. PUT e GET so funcionam depois dele. */
+    // PUT e GET so funcionam depois do INIT
     private static boolean inicializado = false;
 
-    // =================================================================
-    // [Enunciado 6 - menu interativo do cliente]
-    // Oferece as opcoes INIT, PUT e GET em um laco que nao termina por
-    // escolha do usuario: o cliente permanece ativo apos cada operacao.
-    // =================================================================
     public static void main(String[] args) {
         Scanner teclado = new Scanner(System.in);
 
@@ -82,18 +44,13 @@ public class Cliente {
             System.out.println("3 - GET");
             System.out.print("Escolha: ");
 
-            // Se a entrada do teclado terminar (console fechado, por exemplo),
-            // nextLine() lancaria excecao. Saindo do laco, a thread que escuta
-            // as respostas assincronas continua viva e o processo segue ativo.
+            // evita erro se a entrada do teclado for fechada
             if (!teclado.hasNextLine()) {
                 return;
             }
 
             String opcao = teclado.nextLine().trim();
 
-            // PUT e GET escolhidos antes do INIT apenas voltam ao menu, sem
-            // imprimir nada: sem os enderecos dos servidores nao ha para quem
-            // enviar a requisicao.
             if (opcao.equals("1")) {
                 inicializar(teclado);
             } else if (opcao.equals("2")) {
@@ -108,11 +65,7 @@ public class Cliente {
         }
     }
 
-    // =================================================================
-    // [Enunciado 4a - INIT do cliente]
-    // Captura do teclado o IP e a porta dos tres servidores, abre a porta
-    // de escuta do cliente e inicia a thread que recebe respostas tardias.
-    // =================================================================
+    // INIT: le os enderecos dos tres servidores e abre a porta de escuta.
     private static void inicializar(Scanner teclado) {
         servidores.clear();
 
@@ -127,15 +80,8 @@ public class Cliente {
         }
 
         try {
-            // [Enunciado 4c - resposta assincrona do GET]
-            // A porta 0 faz o sistema operacional escolher qualquer porta
-            // livre. Depois perguntamos qual foi, com getLocalPort().
-            //
-            // A porta e aberta UMA unica vez. Num INIT repetido, os enderecos
-            // dos servidores acima sao reescritos, mas a porta de escuta e a
-            // thread que a atende sao reaproveitadas: abrir outra deixaria a
-            // anterior aberta sem ninguem usando, e a resposta tardia de um GET
-            // poderia aparecer duas vezes.
+            // a porta de escuta so e aberta no primeiro INIT; nos seguintes
+            // ela e reaproveitada. A porta 0 pede ao sistema uma porta livre.
             if (!inicializado) {
                 ServerSocket escuta = new ServerSocket(0);
                 minhaPorta = escuta.getLocalPort();
@@ -145,22 +91,13 @@ public class Cliente {
                 inicializado = true;
             }
         } catch (IOException e) {
-            // Nao foi possivel abrir a porta de escuta. O cliente continua no
-            // menu, mas sem o INIT concluido.
         }
     }
 
-    // =================================================================
-    // [Enunciado 4c - resposta assincrona do GET] CLASSE DE THREAD
-    //
-    // Papel desta thread: ficar permanentemente em accept(), esperando que
-    // algum servidor ligue de volta com a resposta tardia de um GET que
-    // recebeu WAIT_FOR_RESPONSE. Gracas a ela o cliente nunca fica
-    // bloqueado esperando: ele volta ao menu e a resposta chega depois.
-    // =================================================================
+    // Fica esperando os servidores enviarem a resposta atrasada de um GET
+    // que recebeu WAIT_FOR_RESPONSE. Assim o cliente nao fica bloqueado.
     private static class EscutaRespostas extends Thread {
 
-        /** Porta de escuta do cliente, aberta no INIT. */
         private ServerSocket escuta;
 
         public EscutaRespostas(ServerSocket escuta) {
@@ -175,23 +112,15 @@ public class Cliente {
                     conexao.close();
 
                     if (resposta != null) {
-                        // Esta e a resposta tardia de um GET que havia recebido
-                        // WAIT_FOR_RESPONSE. Agora sim o timestamp local e
-                        // atualizado e a linha final do GET e impressa.
                         imprimirRespostaGet(resposta);
                     }
                 } catch (IOException e) {
-                    // Conexao com problema: ignora e continua escutando.
                 }
             }
         }
     }
 
-    // =================================================================
-    // [Enunciado 4b - PUT do cliente]
-    // Captura key e value, envia o PUT a um servidor sorteado e espera o
-    // PUT_OK, que traz o timestamp gerado pelo lider.
-    // =================================================================
+    // PUT: le key e value, envia a um servidor sorteado e espera o PUT_OK.
     private static void enviarPut(Scanner teclado) {
         System.out.print("Digite a key: ");
         String chave = teclado.nextLine();
@@ -205,9 +134,7 @@ public class Cliente {
             Mensagem pedido = new Mensagem(Mensagem.PUT);
             pedido.setChave(chave);
             pedido.setValor(valor);
-            // Informa onde o servidor pode encontrar este cliente. O IP e
-            // tirado do proprio socket: e exatamente o endereco pelo qual
-            // este servidor consegue responder de volta.
+            // IP do cliente tirado do proprio socket da conexao
             pedido.setIpCliente(conexao.getLocalAddress().getHostAddress());
             pedido.setPortaCliente(minhaPorta);
 
@@ -216,7 +143,7 @@ public class Cliente {
             conexao.close();
 
             if (resposta != null) {
-                // Registra a versao recem gravada na tabela local de timestamps.
+                // guarda o timestamp gerado pelo lider
                 synchronized (trava) {
                     meusTimestamps.put(chave, Long.valueOf(resposta.getTimestamp()));
                 }
@@ -228,16 +155,10 @@ public class Cliente {
                         + ":" + resposta.getPortaServidor());
             }
         } catch (IOException e) {
-            // O servidor sorteado nao respondeu. A operacao e abandonada sem
-            // nenhuma impressao e o cliente volta ao menu.
         }
     }
 
-    // =================================================================
-    // [Enunciado 4c - GET do cliente]
-    // Captura so a key. O timestamp NAO vem do teclado: e o ultimo que o
-    // cliente ja viu para aquela chave (0 se nunca viu).
-    // =================================================================
+    // GET: le a key e envia junto o ultimo timestamp visto dela (0 se nunca viu).
     private static void enviarGet(Scanner teclado) {
         System.out.print("Digite a key: ");
         String chave = teclado.nextLine();
@@ -262,17 +183,9 @@ public class Cliente {
             conexao.close();
 
             if (resposta != null) {
-                // [Enunciado 4c - GET do cliente] resposta WAIT_FOR_RESPONSE
-                // O servidor avisou que esta atrasado e cortou a conexao. O
-                // cliente NAO fica bloqueado: imprime a linha diferenciada,
-                // volta ao menu, e a resposta de verdade chega depois pela
-                // porta de escuta (thread EscutaRespostas).
-                // O timestamp local NAO e atualizado aqui, porque nenhum valor
-                // novo foi lido nesta interacao.
+                // servidor atrasado: o cliente volta ao menu e a resposta chega
+                // depois pela porta de escuta. O timestamp nao e atualizado aqui.
                 if (Mensagem.WAIT_FOR_RESPONSE.equals(resposta.getTipo())) {
-                    // Formato distinto do usado na resposta normal do GET:
-                    // sem "value:" e sem o timestamp do servidor, porque
-                    // nenhum valor foi lido nesta interacao.
                     System.out.println("GET key: " + resposta.getChave()
                             + " " + Mensagem.WAIT_FOR_RESPONSE
                             + " do servidor " + resposta.getIpServidor()
@@ -283,27 +196,17 @@ public class Cliente {
                 }
             }
         } catch (IOException e) {
-            // O servidor sorteado nao respondeu. A operacao e abandonada sem
-            // nenhuma impressao e o cliente volta ao menu.
         }
     }
 
-    /*
-     * Imprime a resposta de um GET. Fica em um metodo separado porque a
-     * resposta pode chegar por dois caminhos: na hora (metodo enviarGet)
-     * ou depois, pela porta de escuta (thread EscutaRespostas).
-     *
-     * "meu timestamp" e o que o cliente tinha ANTES desta resposta: e o
-     * valor que ele enviou no pedido, e serve para comparar com o do
-     * servidor e mostrar que a leitura nunca anda para tras.
-     */
+    // Imprime a resposta do GET e atualiza o timestamp local se o do servidor
+    // for maior. Usado na resposta imediata e na atrasada.
     private static void imprimirRespostaGet(Mensagem resposta) {
         long meuTimestamp;
         synchronized (trava) {
             Long t = meusTimestamps.get(resposta.getChave());
             meuTimestamp = (t == null) ? 0L : t.longValue();
 
-            // Avanca o timestamp local se o servidor devolveu versao mais nova.
             if (resposta.getTimestamp() > meuTimestamp) {
                 meusTimestamps.put(resposta.getChave(), Long.valueOf(resposta.getTimestamp()));
             }
@@ -317,32 +220,21 @@ public class Cliente {
                 + " e do servidor " + resposta.getTimestamp());
     }
 
-    /*
-     * Sorteia um dos tres servidores e abre uma conexao TCP com ele. A
-     * escolha e uniforme e independe de qual servidor seja o lider.
-     */
+    // Sorteia um dos tres servidores e abre uma conexao com ele.
     private static Socket conectarServidorAleatorio() throws IOException {
         String endereco = servidores.get(sorteio.nextInt(servidores.size()));
         String[] partes = endereco.split(":");
         return new Socket(partes[0], Integer.parseInt(partes[1]));
     }
 
-    // =================================================================
-    // ENVIO E RECEBIMENTO DA CLASSE Mensagem PELA REDE
-    // Mesmo protocolo do servidor: uma mensagem JSON por linha.
-    // =================================================================
-
-    /** Converte a Mensagem em JSON e a escreve na conexao, seguida de nova linha. */
+    // Envia a mensagem como uma linha JSON.
     private static void enviarMensagem(Socket conexao, Mensagem mensagem) throws IOException {
         PrintWriter saida = new PrintWriter(
                 new OutputStreamWriter(conexao.getOutputStream(), "UTF-8"), true);
         saida.println(gson.toJson(mensagem));
     }
 
-    /**
-     * Le uma linha JSON da conexao e a transforma de volta em Mensagem.
-     * Devolve null se a outra ponta fechou a conexao sem enviar nada.
-     */
+    // Le uma linha JSON e converte em Mensagem. Retorna null se a conexao fechou.
     private static Mensagem receberMensagem(Socket conexao) throws IOException {
         BufferedReader entrada = new BufferedReader(
                 new InputStreamReader(conexao.getInputStream(), "UTF-8"));
