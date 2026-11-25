@@ -1,0 +1,14 @@
+"""Build a self-contained playback HTML. Studio still uses the local C service."""
+import json,re
+from pathlib import Path
+root=Path(__file__).resolve().parent
+def text(name):return (root/'dist'/name).read_text(encoding='utf-8')
+def plain(name):return re.sub(r'^export ', '', re.sub(r'^import .*?;\n','',text(name),flags=re.M),flags=re.M)
+worker=plain('core.js')+'\n'+plain('audio.js')+'\n'+plain('worker.js')
+games={name:json.loads(text('examples/'+name+'.json'))['package'] for name in ['dino','flappybird','hollow','mandelbrot','starter']}
+script='const WORKER_SOURCE='+json.dumps(worker)+';\nconst GAMES='+json.dumps(games,separators=(',',':'))+';\n'+plain('renderer.js')+'\n'+text('player.js')
+html='''<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Riscplay Player</title><style>
+body{background:#101719;color:#e9efeb;font:14px system-ui;margin:0;padding:20px}main{max-width:900px;margin:auto}h1{font-size:24px;margin:0 0 8px}p{color:#a3b6af;font-size:13px}canvas{width:100%;aspect-ratio:16/9;image-rendering:pixelated;background:#050d0b;border:1px solid #48645b;border-radius:8px;display:block}button,select{background:#243c34;color:#e4f5eb;border:1px solid #5a8977;border-radius:6px;padding:10px;font:inherit;cursor:pointer}nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.pad{display:flex;gap:8px;justify-content:center;touch-action:none;margin:18px}.pad button{width:50px}.pad button:active{background:#80e0bd;color:#101719}#status{font:12px monospace;min-height:35px}a{color:#80e0bd}</style>
+<main><h1>riscplay / player</h1><p>DRV32 · 30,9375 MHz virtual · reprodução offline. Para editar C e gerar assets, abra o Riscplay Studio pelo servidor.</p><nav><select id="game"><option value="dino">Dino</option><option value="flappybird">FlappyBird</option><option value="hollow">Hollow</option><option value="mandelbrot">Mandelbrot</option><option value="starter">Bancada criativa</option></select><button id="open">Abrir .json.prog</button><button id="pause">Pausar</button><button id="restart">Reiniciar</button><button id="sound">Ativar som</button><button id="full">Tela cheia</button></nav><canvas id="screen" width="320" height="180" tabindex="0"></canvas><div class="pad"><button data-bit="7">←</button><button data-bit="4">↑</button><button data-bit="6">↓</button><button data-bit="5">→</button><button data-bit="14">×</button><button data-bit="13">○</button></div><p id="status">Iniciando…</p><p>Setas: mover · Espaço/Z: X · X: círculo · A: quadrado · S: triângulo. Gamepad padrão também suportado. Clique em Ativar som para ouvir.</p><input id="input" type="file" accept=".json,.prog" hidden></main><script>'''+script.replace('</script','<\/script')+'</script></html>'
+(root/'Riscplay_Player.html').write_text(html,encoding='utf-8')
+print('Offline player:',len(html.encode('utf-8')),'bytes')

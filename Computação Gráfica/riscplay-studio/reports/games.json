@@ -1,0 +1,143 @@
+[
+  {
+    "name": "flappybird",
+    "reports": [
+      {
+        "game": "flappybird",
+        "frame": 1,
+        "ms": 17,
+        "instructions": 2529,
+        "commands": 28,
+        "audio": 18,
+        "pixelDifferences": 0,
+        "sha256": "d52fd75d6044346fe724c7d770503b7f4cffabbc5c0a7dd1d57ea32489f461a2"
+      },
+      {
+        "game": "flappybird",
+        "frame": 2,
+        "ms": 33,
+        "instructions": 3241,
+        "commands": 54,
+        "audio": 18,
+        "pixelDifferences": 0,
+        "sha256": "d52fd75d6044346fe724c7d770503b7f4cffabbc5c0a7dd1d57ea32489f461a2"
+      },
+      {
+        "game": "flappybird",
+        "frame": 3,
+        "ms": 50,
+        "instructions": 3955,
+        "commands": 80,
+        "audio": 18,
+        "pixelDifferences": 0,
+        "sha256": "d52fd75d6044346fe724c7d770503b7f4cffabbc5c0a7dd1d57ea32489f461a2"
+      },
+      {
+        "game": "flappybird",
+        "frame": 4,
+        "ms": 67,
+        "instructions": 4667,
+        "commands": 106,
+        "audio": 18,
+        "pixelDifferences": 0,
+        "sha256": "d52fd75d6044346fe724c7d770503b7f4cffabbc5c0a7dd1d57ea32489f461a2"
+      },
+      {
+        "game": "flappybird",
+        "frame": 5,
+        "ms": 83,
+        "instructions": 5379,
+        "commands": 132,
+        "audio": 18,
+        "pixelDifferences": 0,
+        "sha256": "d52fd75d6044346fe724c7d770503b7f4cffabbc5c0a7dd1d57ea32489f461a2"
+      }
+    ],
+    "host_ms": 160,
+    "fault": null
+  },
+  {
+    "name": "hollow",
+    "reports": [
+      {
+        "game": "hollow",
+        "frame": 1,
+        "ms": 17,
+        "instructions": 322,
+        "commands": 4,
+        "audio": 5,
+        "pixelDifferences": 0,
+        "sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b"
+      },
+      {
+        "game": "hollow",
+        "frame": 2,
+        "ms": 67,
+        "instructions": 9297,
+        "commands": 117,
+        "audio": 39,
+        "pixelDifferences": 0,
+        "sha256": "4f26242178ad00ce04fc4980ef8942a915df247c643f32aae66d449fed6b4c90"
+      },
+      {
+        "game": "hollow",
+        "frame": 3,
+        "ms": 117,
+        "instructions": 15587,
+        "commands": 230,
+        "audio": 39,
+        "pixelDifferences": 0,
+        "sha256": "4f26242178ad00ce04fc4980ef8942a915df247c643f32aae66d449fed6b4c90"
+      },
+      {
+        "game": "hollow",
+        "frame": 4,
+        "ms": 167,
+        "instructions": 21879,
+        "commands": 343,
+        "audio": 39,
+        "pixelDifferences": 0,
+        "sha256": "4f26242178ad00ce04fc4980ef8942a915df247c643f32aae66d449fed6b4c90"
+      },
+      {
+        "game": "hollow",
+        "frame": 5,
+        "ms": 217,
+        "instructions": 28169,
+        "commands": 456,
+        "audio": 39,
+        "pixelDifferences": 0,
+        "sha256": "4f26242178ad00ce04fc4980ef8942a915df247c643f32aae66d449fed6b4c90"
+      }
+    ],
+    "host_ms": 148,
+    "fault": null
+  },
+  {
+    "name": "mandelbrot",
+    "reports": [
+      {
+        "game": "mandelbrot",
+        "frame": 1,
+        "ms": 17,
+        "instructions": 82,
+        "commands": 5,
+        "audio": 0,
+        "pixelDifferences": 0,
+        "sha256": "7eda1b6c56750b8be64fc6bb07edc1e2ea35f7ef45987366ff7fdf034661c773"
+      },
+      {
+        "game": "mandelbrot",
+        "frame": 2,
+        "ms": 10167,
+        "instructions": 44419000,
+        "commands": 3783,
+        "audio": 0,
+        "pixelDifferences": 0,
+        "sha256": "968666515c79daaaf0e73c98405470b6f2800d974c64b694cbcb4fc427c583be"
+      }
+    ],
+    "host_ms": 1065,
+    "fault": null
+  }
+]

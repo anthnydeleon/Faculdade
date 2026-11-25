@@ -1,0 +1,30 @@
+[
+  {
+    "game": "flappybird",
+    "ok": true,
+    "size": 9472,
+    "matches_original_binary": true,
+    "loader_roundtrip": true
+  },
+  {
+    "game": "hollow",
+    "ok": true,
+    "size": 20400,
+    "matches_original_binary": false,
+    "loader_roundtrip": true
+  },
+  {
+    "game": "mandelbrot",
+    "ok": true,
+    "size": 1576,
+    "matches_original_binary": true,
+    "loader_roundtrip": true
+  },
+  {
+    "game": "starter",
+    "ok": true,
+    "size": 1768,
+    "matches_original_binary": true,
+    "loader_roundtrip": true
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "rtlRetirementsCompared": 73882,
+  "faultCases": 5,
+  "rebuiltGames": 4,
+  "loaderRoundtrips": 4,
+  "pulse440HzCrossings": 43,
+  "inputResults": [
+    {
+      "game": "flappybird",
+      "buttonReads": 321,
+      "audioWrites": 110,
+      "nonzeroSamples": 41948,
+      "frames": 177
+    },
+    {
+      "game": "hollow",
+      "buttonReads": 65,
+      "audioWrites": 55,
+      "nonzeroSamples": 49978,
+      "frames": 65
+    }
+  ]
+}
